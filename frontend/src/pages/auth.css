@@ -1,0 +1,79 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.auth-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  animation: float 8s ease-in-out infinite;
+}
+.blob-1 { width: 380px; height: 380px; background: var(--color-primary); top: -100px; left: -100px; }
+.blob-2 { width: 320px; height: 320px; background: var(--color-secondary); bottom: -100px; right: -100px; animation-delay: 2s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-25px) scale(1.05); }
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 40px 36px;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 480px) {
+  .auth-card { padding: 30px 22px; }
+  .auth-card h2 { font-size: 1.35rem; }
+  .blob-1, .blob-2 { width: 220px !important; height: 220px !important; }
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-bottom: 28px;
+}
+
+.auth-card h2 { font-size: 1.6rem; font-weight: 800; }
+.auth-subtitle { color: var(--text-secondary); margin: 6px 0 26px; font-size: 0.9rem; }
+
+.input-icon-wrap { position: relative; display: flex; align-items: center; }
+.input-icon { position: absolute; left: 16px; color: var(--text-secondary); font-size: 0.9rem; }
+.input-icon-wrap .form-input { padding-left: 44px; }
+.input-icon-right { position: absolute; right: 14px; color: var(--text-secondary); }
+
+.auth-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -8px 0 22px;
+  font-size: 0.85rem;
+}
+.checkbox-label { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+.auth-link { color: var(--color-primary); font-weight: 600; }
+.auth-link:hover { text-decoration: underline; }
+
+.auth-submit { width: 100%; padding: 14px; font-size: 0.95rem; }
+.auth-footer-text { text-align: center; margin-top: 24px; font-size: 0.88rem; color: var(--text-secondary); }
+
+.password-strength {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+.strength-bar { flex: 1; height: 4px; border-radius: 4px; background: rgba(148,163,184,0.2); }
+.strength-bar.active-weak { background: var(--color-danger); }
+.strength-bar.active-medium { background: var(--color-warning); }
+.strength-bar.active-strong { background: var(--color-success); }

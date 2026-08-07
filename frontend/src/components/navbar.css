@@ -1,0 +1,98 @@
+.navbar {
+  position: sticky;
+  top: 16px;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--navbar-height);
+  padding: 0 22px;
+  margin: 16px 16px 0 0;
+}
+
+.navbar-left { display: flex; align-items: center; gap: 16px; flex: 1; }
+
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+.icon-btn:hover { background: rgba(79, 70, 229, 0.08); color: var(--color-primary); }
+.mobile-only { display: none; }
+
+.navbar-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: var(--radius-full);
+  padding: 10px 18px;
+  max-width: 420px;
+  width: 100%;
+  color: var(--text-secondary);
+}
+.navbar-search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text-primary);
+  width: 100%;
+  font-size: 0.88rem;
+}
+
+.navbar-right { display: flex; align-items: center; gap: 10px; }
+
+.notif-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-profile { display: flex; align-items: center; gap: 10px; padding-left: 10px; }
+
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.profile-meta { display: flex; flex-direction: column; }
+.profile-name { font-weight: 600; font-size: 0.85rem; }
+.profile-role { width: fit-content; margin-top: 2px; }
+
+@media (max-width: 900px) {
+  .navbar { top: 12px; margin: 12px 12px 0; }
+  .mobile-only { display: flex; }
+  .navbar-left .icon-btn:first-child { display: none; }
+  .navbar-search { display: none; }
+  .profile-meta { display: none; }
+}
+
+@media (max-width: 480px) {
+  .navbar { padding: 0 14px; height: 62px; }
+  .icon-btn { width: 38px; height: 38px; font-size: 0.95rem; }
+  .avatar-circle { width: 36px; height: 36px; }
+}

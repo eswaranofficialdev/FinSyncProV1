@@ -1,0 +1,16 @@
+.chart-card { padding: 24px; }
+.chart-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 18px; }
+.chart-wrap { height: 280px; position: relative; }
+.chart-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 560px) {
+  .chart-card { padding: 16px; }
+  .chart-wrap { height: 220px; }
+}

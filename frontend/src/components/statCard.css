@@ -1,0 +1,52 @@
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  top: -50px;
+  right: -50px;
+  opacity: 0.15;
+}
+
+.grad-primary::after { background: var(--gradient-primary); }
+.grad-success::after { background: var(--gradient-success); }
+.grad-danger::after { background: var(--gradient-danger); }
+.grad-warning::after { background: linear-gradient(135deg, #F59E0B, #EF4444); }
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #fff;
+  z-index: 1;
+}
+.grad-primary .stat-icon { background: var(--gradient-primary); }
+.grad-success .stat-icon { background: var(--gradient-success); }
+.grad-danger .stat-icon { background: var(--gradient-danger); }
+.grad-warning .stat-icon { background: linear-gradient(135deg, #F59E0B, #EF4444); }
+
+.stat-body { display: flex; flex-direction: column; z-index: 1; }
+.stat-title { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
+.stat-value { font-size: 1.5rem; font-weight: 800; margin-top: 2px; }
+.stat-subtitle { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; }
+
+@media (max-width: 560px) {
+  .stat-card { padding: 16px; gap: 12px; }
+  .stat-icon { width: 42px; height: 42px; min-width: 42px; font-size: 1.05rem; }
+  .stat-value { font-size: 1.2rem; }
+}

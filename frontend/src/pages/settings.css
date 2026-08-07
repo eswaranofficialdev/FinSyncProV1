@@ -1,0 +1,17 @@
+.settings-tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.settings-tab {
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: rgba(148,163,184,0.1);
+  transition: all var(--transition-fast);
+}
+.settings-tab.active { background: var(--gradient-primary); color: #fff; }
