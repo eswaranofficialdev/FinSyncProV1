@@ -4,6 +4,7 @@ const {
   getCommunities, createCommunity, getCommunityById, getCommunityTransactions,
   addMember, removeMember, updateMemberRole, deleteCommunity,
   addSplitExpense, settleBalance,
+  createSettlementRequest, getSettlementRequests, respondToSettlementRequest,
 } = require('../controllers/communityController');
 const { protect } = require('../middlewares/auth');
 
@@ -21,5 +22,8 @@ router.delete('/:id/members/:userId', removeMember);
 router.patch('/:id/members/:userId/role', updateMemberRole);
 router.post('/:id/split-expense', addSplitExpense);
 router.post('/:id/settle', settleBalance);
+router.post('/:id/settlement-requests', createSettlementRequest);
+router.get('/:id/settlement-requests', getSettlementRequests);
+router.patch('/:id/settlement-requests/:requestId', respondToSettlementRequest);
 
 module.exports = router;

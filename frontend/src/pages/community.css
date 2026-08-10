@@ -70,3 +70,42 @@
   border-radius: var(--radius-sm);
   background: rgba(148,163,184,0.08);
 }
+
+.settlement-request-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settlement-request-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  flex-wrap: wrap;
+}
+
+.split-txn-list { display: flex; flex-direction: column; gap: 14px; }
+.split-txn-card {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.split-txn-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.split-txn-total { font-weight: 700; font-size: 1.05rem; white-space: nowrap; }
+
+/* Add to community.css if missing */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+td[data-label="Involved Members"] {
+  max-width: 250px;
+  white-space: normal;
+  line-height: 1.4;
+}

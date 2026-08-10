@@ -3,6 +3,7 @@ const Community = require('../models/Community');
 const CommunityMember = require('../models/CommunityMember');
 const Transaction = require('../models/Transaction');
 const Notification = require('../models/Notification');
+const SettlementRequest = require('../models/SettlementRequest');
 const ApiResponse = require('../utils/apiResponse');
 
 // ---------- helpers ----------
@@ -285,4 +286,139 @@ exports.settleBalance = asyncHandler(async (req, res) => {
   });
 
   ApiResponse.success(res, 200, 'Settlement recorded', member);
+});
+
+// ---------- Pay Request workflow (member requests -> owner approves) ----------
+
+// @desc    A member requests to pay off some or all of what they owe.
+//          Nothing on the balance sheet changes until the Owner approves it.
+// @route   POST /api/communities/:id/settlement-requests
+// @access  Private (any member with an outstanding balance)
+exports.createSettlementRequest = asyncHandler(async (req, res) => {
+  const community = await Community.findById(req.params.id);
+  if (!community) return ApiResponse.error(res, 404, 'Community not found');
+
+  const membership = await getMembership(community._id, req.user._id);
+  if (!membership) return ApiResponse.error(res, 403, 'You are not a member of this community');
+
+  if (membership.totalOwed <= 0) {
+    return ApiResponse.success(res, 200, 'You have no pending dues in this community', { hasPending: false });
+  }
+
+  let { amount } = req.body;
+  amount = Number(amount);
+  if (!amount || amount <= 0) {
+    return ApiResponse.error(res, 400, 'Enter a valid amount to pay');
+  }
+  if (amount > membership.totalOwed) {
+    return ApiResponse.error(
+      res, 400,
+      `You only owe $${membership.totalOwed.toFixed(2)} — you can't request to pay more than that`
+    );
+  }
+
+  // Prevent stacking multiple pending requests at once
+  const existingPending = await SettlementRequest.findOne({
+    community: community._id, fromUser: req.user._id, status: 'pending',
+  });
+  if (existingPending) {
+    return ApiResponse.error(res, 409, 'You already have a pending payment request awaiting approval');
+  }
+
+  const request = await SettlementRequest.create({
+    community: community._id,
+    fromUser: req.user._id,
+    amount,
+  });
+
+  await Notification.create({
+    recipient: community.admin, // the community owner
+    type: 'settlement_requested',
+    title: 'New Payment Request',
+    message: `${req.user.name} wants to pay $${amount.toFixed(2)} toward their balance in "${community.name}".`,
+    link: `/community`,
+  });
+
+  ApiResponse.success(res, 201, 'Payment request sent to the community owner', request);
+});
+
+// @desc    List settlement requests for a community.
+//          Owner sees everyone's requests; a regular member sees only their own.
+// @route   GET /api/communities/:id/settlement-requests
+// @access  Private
+exports.getSettlementRequests = asyncHandler(async (req, res) => {
+  const community = await Community.findById(req.params.id);
+  if (!community) return ApiResponse.error(res, 404, 'Community not found');
+
+  const isOwner = String(community.admin) === String(req.user._id);
+  const membership = await getMembership(community._id, req.user._id);
+  if (!membership && !isSuperadmin(req)) {
+    return ApiResponse.error(res, 403, 'You are not a member of this community');
+  }
+
+  const query = { community: community._id };
+  if (!isOwner) query.fromUser = req.user._id; // non-owners only ever see their own requests
+
+  const requests = await SettlementRequest.find(query)
+    .populate('fromUser', 'name email avatar')
+    .populate('respondedBy', 'name')
+    .sort('-createdAt');
+
+  ApiResponse.success(res, 200, 'Settlement requests fetched', requests);
+});
+
+// @desc    Approve or reject a member's payment request — Owner only.
+//          On approval, the requester's totalOwed decreases and totalContributed
+//          increases by exactly the approved amount.
+// @route   PATCH /api/communities/:id/settlement-requests/:requestId
+// @access  Private (community owner)
+exports.respondToSettlementRequest = asyncHandler(async (req, res) => {
+  const { action } = req.body; // 'approve' | 'reject'
+  if (!['approve', 'reject'].includes(action)) {
+    return ApiResponse.error(res, 400, 'Action must be "approve" or "reject"');
+  }
+
+  const community = await Community.findById(req.params.id);
+  if (!community) return ApiResponse.error(res, 404, 'Community not found');
+
+  if (String(community.admin) !== String(req.user._id)) {
+    return ApiResponse.error(res, 403, 'Only the community owner can respond to payment requests');
+  }
+
+  const request = await SettlementRequest.findOne({ _id: req.params.requestId, community: community._id });
+  if (!request) return ApiResponse.error(res, 404, 'Payment request not found');
+  if (request.status !== 'pending') {
+    return ApiResponse.error(res, 400, `This request was already ${request.status}`);
+  }
+
+  if (action === 'approve') {
+    const membership = await getMembership(community._id, request.fromUser);
+    if (!membership) return ApiResponse.error(res, 404, 'Member no longer belongs to this community');
+
+    // Clamp defensively in case their balance changed since the request was made
+    const payAmount = Math.min(request.amount, Math.max(membership.totalOwed, 0));
+    membership.totalOwed -= payAmount;
+    membership.totalContributed += payAmount;
+    await membership.save();
+
+    request.status = 'approved';
+  } else {
+    request.status = 'rejected';
+  }
+
+  request.respondedBy = req.user._id;
+  request.respondedAt = new Date();
+  await request.save();
+
+  await Notification.create({
+    recipient: request.fromUser,
+    type: action === 'approve' ? 'settlement_approved' : 'settlement_rejected',
+    title: action === 'approve' ? 'Payment Approved' : 'Payment Rejected',
+    message:
+      action === 'approve'
+        ? `Your payment of $${request.amount.toFixed(2)} in "${community.name}" was approved and deducted from your balance.`
+        : `Your payment request of $${request.amount.toFixed(2)} in "${community.name}" was rejected.`,
+  });
+
+  ApiResponse.success(res, 200, `Request ${request.status}`, request);
 });

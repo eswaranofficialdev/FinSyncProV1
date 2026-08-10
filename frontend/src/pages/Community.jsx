@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import {
   FaPlus, FaUserFriends, FaUsers, FaMoneyBillWave, FaUserPlus,
   FaTrash, FaCrown, FaUserShield, FaSearch, FaTimesCircle, FaReceipt,
+  FaHandHoldingUsd, FaCheck, FaTimes, FaClock, FaHistory
 } from 'react-icons/fa';
 import api from '../services/api';
 import Modal from '../components/Modal';
@@ -19,11 +20,17 @@ const roleBadge = (role) => {
   return map[role] || 'badge-info';
 };
 
+const requestStatusBadge = (status) => {
+  const map = { pending: 'badge-warning', approved: 'badge-success', rejected: 'badge-danger' };
+  return map[status] || 'badge-info';
+};
+
 const Community = () => {
   const { user } = useAuth();
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
+
   const [detail, setDetail] = useState(null);
   const [communityTxns, setCommunityTxns] = useState([]);
   const [txnLoading, setTxnLoading] = useState(false);
@@ -36,8 +43,13 @@ const Community = () => {
   const [searching, setSearching] = useState(false);
   const debounceRef = useRef(null);
 
+  const [payOpen, setPayOpen] = useState(false);
+  const [settlementRequests, setSettlementRequests] = useState([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+
   const { register, handleSubmit, reset } = useForm();
   const splitForm = useForm();
+  const payForm = useForm();
 
   const fetchCommunities = useCallback(async () => {
     setLoading(true);
@@ -71,6 +83,7 @@ const Community = () => {
       setDetail(data.data);
       setSelectedMemberIds(data.data.members.map((m) => m.user?._id));
       fetchCommunityTransactions(id);
+      fetchSettlementRequests(id);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to load community detail');
     }
@@ -85,6 +98,18 @@ const Community = () => {
       toast.error(err.response?.data?.message || 'Failed to load community transactions');
     } finally {
       setTxnLoading(false);
+    }
+  };
+
+  const fetchSettlementRequests = async (id) => {
+    setRequestsLoading(true);
+    try {
+      const { data } = await api.get(`/communities/${id}/settlement-requests`);
+      setSettlementRequests(data.data);
+    } catch (err) {
+      // non-fatal — just means the panel stays empty
+    } finally {
+      setRequestsLoading(false);
     }
   };
 
@@ -112,8 +137,6 @@ const Community = () => {
   const toggleSelectedMember = (id) => {
     setSelectedMemberIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
-
-  // --- Member search & add (Owner only) ---
 
   const handleSearchChange = (val) => {
     setSearchQuery(val);
@@ -182,20 +205,66 @@ const Community = () => {
     }
   };
 
+  const myMembership = detail?.members.find((m) => m.user?._id === user?._id);
+
+  const openPayModal = () => {
+    if (!myMembership || myMembership.totalOwed <= 0) {
+      toast.info("You're all settled up — no pending dues in this community!");
+      return;
+    }
+    payForm.reset({ amount: myMembership.totalOwed.toFixed(2) });
+    setPayOpen(true);
+  };
+
+  const onSubmitPayRequest = async (formData) => {
+    try {
+      const { data } = await api.post(`/communities/${detail.community._id}/settlement-requests`, {
+        amount: Number(formData.amount),
+      });
+      if (data.data?.hasPending === false) {
+        toast.info('You have no pending dues in this community');
+      } else {
+        toast.success('Payment request sent — waiting for the owner to approve it');
+      }
+      setPayOpen(false);
+      fetchSettlementRequests(detail.community._id);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to send payment request');
+    }
+  };
+
+  const respondToRequest = async (requestId, action) => {
+    try {
+      await api.patch(`/communities/${detail.community._id}/settlement-requests/${requestId}`, { action });
+      toast.success(action === 'approve' ? 'Payment approved successfully' : 'Payment request rejected');
+      fetchSettlementRequests(detail.community._id);
+      openDetail(detail.community._id); 
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to respond to request');
+    }
+  };
+
   // ---------- Detail view ----------
   if (detail) {
     const isOwner = detail.myRole === 'owner';
     const isCommunityAdmin = detail.myRole === 'admin';
     const isSuperAdmin = user?.role === 'superadmin';
-    const canManageMembers = isOwner; // add/remove/promote — owner only, always
+    const canManageMembers = isOwner; 
     const canAddExpense = isOwner || isCommunityAdmin;
     const canDelete = isOwner || isSuperAdmin;
+    
+    // Split logic for viewing settlement requests
+    const pendingRequests = isOwner 
+      ? settlementRequests.filter((r) => r.status === 'pending') // Owner sees all pending
+      : settlementRequests.filter((r) => r.status === 'pending' && r.fromUser?._id === user?._id); // Member sees only theirs
+
+    const completedPayments = settlementRequests.filter((r) => r.status === 'approved' || r.status === 'completed');
 
     return (
       <div>
         <div className="page-title-row">
           <div>
-            <button className="btn btn-outline" onClick={() => setDetail(null)} style={{ marginBottom: 12 }}>← Back</button>
+            <button className="btn btn-outline" onClick={() => { setDetail(null); }} style={{ marginBottom: 12 }}>← Back</button>
             <h1>{detail.community.name}</h1>
             <p className="page-subtitle">
               {detail.community.type} · {detail.members.length} members
@@ -206,6 +275,12 @@ const Community = () => {
             {canManageMembers && (
               <motion.button className="btn btn-outline" onClick={() => setAddMemberOpen(true)} whileTap={{ scale: 0.96 }}>
                 <FaUserPlus /> Add Member
+              </motion.button>
+            )}
+            {/* Any member (who owes money) can pay */}
+            {!isOwner && myMembership && (
+              <motion.button className="btn btn-outline" onClick={openPayModal} whileTap={{ scale: 0.96 }}>
+                <FaHandHoldingUsd /> Pay Dues
               </motion.button>
             )}
             {canAddExpense && (
@@ -226,7 +301,62 @@ const Community = () => {
             <p className="page-subtitle">Total Community Expense</p>
             <h2>${detail.totalExpenses.toLocaleString()}</h2>
           </div>
+          {myMembership && (
+            <div className="glass-card" style={{ padding: 20 }}>
+              <p className="page-subtitle">Your Balance</p>
+              <h2 style={{ color: myMembership.totalOwed > 0 ? 'var(--color-danger)' : 'var(--color-success)' }}>
+                {myMembership.totalOwed > 0
+                  ? `Owes $${myMembership.totalOwed.toFixed(2)}`
+                  : myMembership.totalOwed < 0
+                  ? `Owed $${Math.abs(myMembership.totalOwed).toFixed(2)}`
+                  : 'All settled up'}
+              </h2>
+            </div>
+          )}
         </div>
+
+        {/* Pending Requests (Owner sees all, Members see only their own) */}
+        {(pendingRequests.length > 0 || isOwner) && (
+          <div className="glass-card" style={{ padding: 20, marginBottom: 20 }}>
+            <h3 style={{ marginBottom: 16 }}>
+              <FaClock style={{ marginRight: 8 }} />
+              {isOwner ? 'Pending Payment Requests (Action Required)' : 'My Pending Payment Requests'}
+            </h3>
+            {requestsLoading ? (
+              <p className="page-subtitle">Loading...</p>
+            ) : pendingRequests.length === 0 ? (
+              <p className="page-subtitle">No pending payment requests right now.</p>
+            ) : (
+              <div className="settlement-request-list">
+                {pendingRequests.map((r) => (
+                  <div key={r._id} className="settlement-request-item">
+                    <div>
+                      <p className="notif-title" style={{ fontSize: '0.9rem' }}>
+                        {isOwner ? `${r.fromUser?.name} wants to pay` : 'You requested to pay'}
+                      </p>
+                      <p className="page-subtitle" style={{ fontSize: '0.8rem' }}>Amount: <strong>${r.amount.toFixed(2)}</strong></p>
+                      <p className="page-subtitle" style={{ fontSize: '0.75rem' }}>{dayjs(r.createdAt).format('DD MMM YYYY, hh:mm A')}</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      {isOwner ? (
+                        <>
+                          <button className="btn btn-primary" style={{ padding: '8px 14px', fontSize: '0.78rem' }} onClick={() => respondToRequest(r._id, 'approve')}>
+                            <FaCheck /> Accept
+                          </button>
+                          <button className="btn btn-outline" style={{ padding: '8px 14px', fontSize: '0.78rem' }} onClick={() => respondToRequest(r._id, 'reject')}>
+                            <FaTimes /> Reject
+                          </button>
+                        </>
+                      ) : (
+                        <span className="badge badge-warning">Waiting for Owner Approval</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="glass-card" style={{ padding: 20 }}>
           <h3 style={{ marginBottom: 16 }}>Members & Balance Sheet</h3>
@@ -279,28 +409,77 @@ const Community = () => {
           </div>
         </div>
 
+        {/* Detailed Community Transactions */}
         <div className="glass-card" style={{ padding: 20, marginTop: 20 }}>
           <h3 style={{ marginBottom: 16 }}><FaReceipt style={{ marginRight: 8 }} />Community Transactions</h3>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Paid By</th>
+                  <th>Involved Members</th>
+                  <th>Split / Member</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {txnLoading ? (
+                  <tr><td colSpan="6" style={{ textAlign: 'center' }}>Loading...</td></tr>
+                ) : communityTxns.length === 0 ? (
+                  <tr><td colSpan="6" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No expenses recorded yet</td></tr>
+                ) : communityTxns.map((t) => {
+                  const involvedCount = t.splitAmong?.length || 1;
+                  const splitPerPerson = (t.amount / involvedCount).toFixed(2);
+                  const involvedNames = t.splitAmong?.map(u => u.name || u.user?.name || 'Unknown').join(', ') || `${involvedCount} members`;
+
+                  return (
+                    <tr key={t._id}>
+                      <td data-label="Description">
+                        {t.description || '(no description)'}
+                        <br/><span className="badge badge-info" style={{ marginTop: 4, display: 'inline-block' }}>{t.category}</span>
+                      </td>
+                      <td data-label="Amount"><strong>${t.amount.toLocaleString()}</strong></td>
+                      <td data-label="Paid By">{t.owner?.name || 'Unknown'}</td>
+                      <td data-label="Involved Members" style={{ fontSize: '0.85rem' }}>{involvedNames}</td>
+                      <td data-label="Split / Member" style={{ color: 'var(--color-danger)' }}>${splitPerPerson}</td>
+                      <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY')}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Completed Paid Transactions (Settlement History) visible to all */}
+        <div className="glass-card" style={{ padding: 20, marginTop: 20 }}>
+          <h3 style={{ marginBottom: 16 }}><FaHistory style={{ marginRight: 8 }} />Paid Transactions History</h3>
           <p className="page-subtitle" style={{ marginTop: -10, marginBottom: 16 }}>
-            Every expense added to this community, visible to all members, so everyone knows what each charge was for.
+            Record of all accepted payments and settlements within the community.
           </p>
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th>Description</th><th>Category</th><th>Amount</th><th>Paid By</th><th>Date</th></tr>
+                <tr>
+                  <th>Member Who Paid</th>
+                  <th>Amount Paid</th>
+                  <th>Date & Time</th>
+                  <th>Status</th>
+                </tr>
               </thead>
               <tbody>
-                {txnLoading ? (
-                  <tr><td colSpan="5" style={{ textAlign: 'center' }}>Loading...</td></tr>
-                ) : communityTxns.length === 0 ? (
-                  <tr><td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No expenses recorded yet</td></tr>
-                ) : communityTxns.map((t) => (
-                  <tr key={t._id}>
-                    <td data-label="Description">{t.description || '(no description)'}</td>
-                    <td data-label="Category"><span className="badge badge-info">{t.category}</span></td>
-                    <td data-label="Amount">${t.amount.toLocaleString()}</td>
-                    <td data-label="Paid By">{t.owner?.name || 'Unknown'}</td>
-                    <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY')}</td>
+                {completedPayments.length === 0 ? (
+                  <tr><td colSpan="4" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No payments have been recorded yet.</td></tr>
+                ) : completedPayments.map(p => (
+                  <tr key={p._id}>
+                    <td data-label="Member Who Paid"><strong>{p.fromUser?.name || 'Unknown'}</strong></td>
+                    <td data-label="Amount Paid" style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
+                      ${p.amount.toFixed(2)}
+                    </td>
+                    <td data-label="Date & Time">{dayjs(p.updatedAt || p.createdAt).format('DD MMM YYYY, hh:mm A')}</td>
+                    <td data-label="Status"><span className="badge badge-success">Accepted by Owner</span></td>
                   </tr>
                 ))}
               </tbody>
@@ -308,7 +487,7 @@ const Community = () => {
           </div>
         </div>
 
-        {/* Split Expense Modal — choose exactly who's involved */}
+        {/* Split Expense Modal */}
         <Modal
           isOpen={splitOpen}
           onClose={() => setSplitOpen(false)}
@@ -347,7 +526,41 @@ const Community = () => {
           </form>
         </Modal>
 
-        {/* Add Member Modal — search-based, Owner only */}
+        {/* Pay Request Modal */}
+        <Modal
+          isOpen={payOpen}
+          onClose={() => setPayOpen(false)}
+          title="Pay Community Dues"
+          footer={
+            <>
+              <button className="btn btn-outline" onClick={() => setPayOpen(false)}>Cancel</button>
+              <button className="btn btn-primary" onClick={payForm.handleSubmit(onSubmitPayRequest)}>Send Request</button>
+            </>
+          }
+        >
+          <form onSubmit={payForm.handleSubmit(onSubmitPayRequest)}>
+            <p className="page-subtitle" style={{ marginBottom: 16 }}>
+              You owe <strong>${myMembership?.totalOwed.toFixed(2)}</strong>. Enter how much you'd like to pay.
+              The community owner needs to accept it before your balance updates.
+            </p>
+            <div className="form-group">
+              <label className="form-label">Amount to Pay</label>
+              <input
+                className="form-input"
+                type="number"
+                step="0.01"
+                max={myMembership?.totalOwed}
+                {...payForm.register('amount', {
+                  required: true,
+                  min: { value: 0.01, message: 'Must be greater than 0' },
+                  max: { value: myMembership?.totalOwed || 0, message: "Can't exceed what you owe" },
+                })}
+              />
+            </div>
+          </form>
+        </Modal>
+
+        {/* Add Member Modal */}
         <Modal
           isOpen={addMemberOpen}
           onClose={() => { setAddMemberOpen(false); setSearchQuery(''); setSearchResults([]); }}

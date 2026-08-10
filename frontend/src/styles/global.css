@@ -33,7 +33,13 @@ input, select, textarea {
   font-family: inherit;
   caret-color: var(--color-primary);
 }
+input:disabled, textarea:disabled, input[readonly], textarea[readonly] {
+  caret-color: transparent;
+  cursor: default;
+}
 input::selection, textarea::selection { background: rgba(79, 70, 229, 0.25); }
+/* 
+input::selection, textarea::selection { background: rgba(79, 70, 229, 0.25); } */
 
 /* Glass Card */
 .glass-card {
