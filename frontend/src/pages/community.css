@@ -1,3 +1,27 @@
+/* --- Fix for annoying Blinking Caret on empty spaces --- */
+body, * {
+  caret-color: transparent; 
+}
+
+/* Ensure caret works properly inside inputs where users actually need to type */
+input, textarea, select, [contenteditable="true"] {
+  caret-color: var(--color-primary, #4F46E5); 
+}
+
+/* Fix table display wrap for long member lists */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+td[data-label="Involved Members"] {
+  max-width: 250px;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+/* ... keep the rest of your original community.css below here ... */
+
 .community-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

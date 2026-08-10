@@ -107,7 +107,7 @@ const Community = () => {
       const { data } = await api.get(`/communities/${id}/settlement-requests`);
       setSettlementRequests(data.data);
     } catch (err) {
-      // non-fatal — just means the panel stays empty
+      // non-fatal
     } finally {
       setRequestsLoading(false);
     }
@@ -253,10 +253,9 @@ const Community = () => {
     const canAddExpense = isOwner || isCommunityAdmin;
     const canDelete = isOwner || isSuperAdmin;
     
-    // Split logic for viewing settlement requests
     const pendingRequests = isOwner 
-      ? settlementRequests.filter((r) => r.status === 'pending') // Owner sees all pending
-      : settlementRequests.filter((r) => r.status === 'pending' && r.fromUser?._id === user?._id); // Member sees only theirs
+      ? settlementRequests.filter((r) => r.status === 'pending') 
+      : settlementRequests.filter((r) => r.status === 'pending' && r.fromUser?._id === user?._id); 
 
     const completedPayments = settlementRequests.filter((r) => r.status === 'approved' || r.status === 'completed');
 
@@ -277,7 +276,6 @@ const Community = () => {
                 <FaUserPlus /> Add Member
               </motion.button>
             )}
-            {/* Any member (who owes money) can pay */}
             {!isOwner && myMembership && (
               <motion.button className="btn btn-outline" onClick={openPayModal} whileTap={{ scale: 0.96 }}>
                 <FaHandHoldingUsd /> Pay Dues
@@ -299,23 +297,22 @@ const Community = () => {
         <div className="stat-grid" style={{ marginBottom: 20 }}>
           <div className="glass-card" style={{ padding: 20 }}>
             <p className="page-subtitle">Total Community Expense</p>
-            <h2>${detail.totalExpenses.toLocaleString()}</h2>
+            <h2>₹{detail.totalExpenses.toLocaleString()}</h2>
           </div>
           {myMembership && (
             <div className="glass-card" style={{ padding: 20 }}>
               <p className="page-subtitle">Your Balance</p>
               <h2 style={{ color: myMembership.totalOwed > 0 ? 'var(--color-danger)' : 'var(--color-success)' }}>
                 {myMembership.totalOwed > 0
-                  ? `Owes $${myMembership.totalOwed.toFixed(2)}`
+                  ? `Owes ₹${myMembership.totalOwed.toFixed(2)}`
                   : myMembership.totalOwed < 0
-                  ? `Owed $${Math.abs(myMembership.totalOwed).toFixed(2)}`
+                  ? `Owed ₹${Math.abs(myMembership.totalOwed).toFixed(2)}`
                   : 'All settled up'}
               </h2>
             </div>
           )}
         </div>
 
-        {/* Pending Requests (Owner sees all, Members see only their own) */}
         {(pendingRequests.length > 0 || isOwner) && (
           <div className="glass-card" style={{ padding: 20, marginBottom: 20 }}>
             <h3 style={{ marginBottom: 16 }}>
@@ -334,7 +331,7 @@ const Community = () => {
                       <p className="notif-title" style={{ fontSize: '0.9rem' }}>
                         {isOwner ? `${r.fromUser?.name} wants to pay` : 'You requested to pay'}
                       </p>
-                      <p className="page-subtitle" style={{ fontSize: '0.8rem' }}>Amount: <strong>${r.amount.toFixed(2)}</strong></p>
+                      <p className="page-subtitle" style={{ fontSize: '0.8rem' }}>Amount: <strong>₹{r.amount.toFixed(2)}</strong></p>
                       <p className="page-subtitle" style={{ fontSize: '0.75rem' }}>{dayjs(r.createdAt).format('DD MMM YYYY, hh:mm A')}</p>
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
@@ -376,10 +373,10 @@ const Community = () => {
                         {m.role}
                       </span>
                     </td>
-                    <td data-label="Contributed">${m.totalContributed.toLocaleString()}</td>
+                    <td data-label="Contributed">₹{m.totalContributed.toLocaleString()}</td>
                     <td data-label="Balance">
                       <span className={`badge ${m.totalOwed > 0 ? 'badge-danger' : 'badge-success'}`}>
-                        {m.totalOwed > 0 ? `Owes $${m.totalOwed.toFixed(2)}` : `Owed $${Math.abs(m.totalOwed).toFixed(2)}`}
+                        {m.totalOwed > 0 ? `Owes ₹${m.totalOwed.toFixed(2)}` : `Owed ₹${Math.abs(m.totalOwed).toFixed(2)}`}
                       </span>
                     </td>
                     {canManageMembers && (
@@ -409,7 +406,6 @@ const Community = () => {
           </div>
         </div>
 
-        {/* Detailed Community Transactions */}
         <div className="glass-card" style={{ padding: 20, marginTop: 20 }}>
           <h3 style={{ marginBottom: 16 }}><FaReceipt style={{ marginRight: 8 }} />Community Transactions</h3>
           <div className="table-wrap">
@@ -421,7 +417,7 @@ const Community = () => {
                   <th>Paid By</th>
                   <th>Involved Members</th>
                   <th>Split / Member</th>
-                  <th>Date</th>
+                  <th>Date & Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -432,7 +428,8 @@ const Community = () => {
                 ) : communityTxns.map((t) => {
                   const involvedCount = t.splitAmong?.length || 1;
                   const splitPerPerson = (t.amount / involvedCount).toFixed(2);
-                  const involvedNames = t.splitAmong?.map(u => u.name || u.user?.name || 'Unknown').join(', ') || `${involvedCount} members`;
+                  // Renders populated names properly
+                  const involvedNames = t.splitAmong?.map(u => u.name || 'Unknown').join(', ') || `${involvedCount} members`;
 
                   return (
                     <tr key={t._id}>
@@ -440,11 +437,11 @@ const Community = () => {
                         {t.description || '(no description)'}
                         <br/><span className="badge badge-info" style={{ marginTop: 4, display: 'inline-block' }}>{t.category}</span>
                       </td>
-                      <td data-label="Amount"><strong>${t.amount.toLocaleString()}</strong></td>
+                      <td data-label="Amount"><strong>₹{t.amount.toLocaleString()}</strong></td>
                       <td data-label="Paid By">{t.owner?.name || 'Unknown'}</td>
                       <td data-label="Involved Members" style={{ fontSize: '0.85rem' }}>{involvedNames}</td>
-                      <td data-label="Split / Member" style={{ color: 'var(--color-danger)' }}>${splitPerPerson}</td>
-                      <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY')}</td>
+                      <td data-label="Split / Member" style={{ color: 'var(--color-danger)' }}>₹{splitPerPerson}</td>
+                      <td data-label="Date & Time">{dayjs(t.date).format('DD MMM YYYY, hh:mm A')}</td>
                     </tr>
                   )
                 })}
@@ -453,7 +450,6 @@ const Community = () => {
           </div>
         </div>
 
-        {/* Completed Paid Transactions (Settlement History) visible to all */}
         <div className="glass-card" style={{ padding: 20, marginTop: 20 }}>
           <h3 style={{ marginBottom: 16 }}><FaHistory style={{ marginRight: 8 }} />Paid Transactions History</h3>
           <p className="page-subtitle" style={{ marginTop: -10, marginBottom: 16 }}>
@@ -476,7 +472,7 @@ const Community = () => {
                   <tr key={p._id}>
                     <td data-label="Member Who Paid"><strong>{p.fromUser?.name || 'Unknown'}</strong></td>
                     <td data-label="Amount Paid" style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
-                      ${p.amount.toFixed(2)}
+                      ₹{p.amount.toFixed(2)}
                     </td>
                     <td data-label="Date & Time">{dayjs(p.updatedAt || p.createdAt).format('DD MMM YYYY, hh:mm A')}</td>
                     <td data-label="Status"><span className="badge badge-success">Accepted by Owner</span></td>
@@ -487,7 +483,6 @@ const Community = () => {
           </div>
         </div>
 
-        {/* Split Expense Modal */}
         <Modal
           isOpen={splitOpen}
           onClose={() => setSplitOpen(false)}
@@ -526,7 +521,6 @@ const Community = () => {
           </form>
         </Modal>
 
-        {/* Pay Request Modal */}
         <Modal
           isOpen={payOpen}
           onClose={() => setPayOpen(false)}
@@ -540,7 +534,7 @@ const Community = () => {
         >
           <form onSubmit={payForm.handleSubmit(onSubmitPayRequest)}>
             <p className="page-subtitle" style={{ marginBottom: 16 }}>
-              You owe <strong>${myMembership?.totalOwed.toFixed(2)}</strong>. Enter how much you'd like to pay.
+              You owe <strong>₹{myMembership?.totalOwed.toFixed(2)}</strong>. Enter how much you'd like to pay.
               The community owner needs to accept it before your balance updates.
             </p>
             <div className="form-group">
@@ -560,7 +554,6 @@ const Community = () => {
           </form>
         </Modal>
 
-        {/* Add Member Modal */}
         <Modal
           isOpen={addMemberOpen}
           onClose={() => { setAddMemberOpen(false); setSearchQuery(''); setSearchResults([]); }}
@@ -598,7 +591,6 @@ const Community = () => {
     );
   }
 
-  // ---------- List view ----------
   return (
     <div>
       <div className="page-title-row">

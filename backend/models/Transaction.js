@@ -16,6 +16,7 @@ const transactionSchema = new mongoose.Schema(
       enum: [
         'Salary', 'Shopping', 'Bills', 'Travel', 'Health', 'Education',
         'Investment', 'Loan', 'Savings', 'Food', 'Rent', 'Entertainment', 'Others',
+        'Community Payment' // 🌟 ADDED: Required for settlement transactions to save without validation errors
       ],
       default: 'Others',
     },
@@ -42,6 +43,12 @@ const transactionSchema = new mongoose.Schema(
 
     reminder: { type: Date, default: null },
     isPinned: { type: Boolean, default: false },
+
+    // 🌟 ADDED: Fixes the "Cannot populate path splitAmong" error 🌟
+    splitAmong: [{ 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'User' 
+    }]
   },
   { timestamps: true }
 );

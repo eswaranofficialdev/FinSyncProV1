@@ -56,8 +56,8 @@ const Profile = () => {
           <h3>Statistics</h3>
           {stats ? (
             <ul>
-              <li>Total Income: <strong>${stats.totalIncome.toLocaleString()}</strong></li>
-              <li>Total Expense: <strong>${stats.totalExpense.toLocaleString()}</strong></li>
+              <li>Total Income: <strong>₹{stats.totalIncome.toLocaleString()}</strong></li>
+              <li>Total Expense: <strong>₹{stats.totalExpense.toLocaleString()}</strong></li>
               <li>Communities Joined: <strong>{stats.communityCount}</strong></li>
             </ul>
           ) : (

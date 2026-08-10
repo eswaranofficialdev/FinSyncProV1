@@ -90,6 +90,7 @@ exports.getCommunityTransactions = asyncHandler(async (req, res) => {
 
   const transactions = await Transaction.find({ community: community._id })
     .populate('owner', 'name email avatar')
+    .populate('splitAmong', 'name') // POPULATING INVOLVED MEMBERS
     .sort('-date');
 
   ApiResponse.success(res, 200, 'Community transactions fetched', transactions);
@@ -218,6 +219,7 @@ exports.addSplitExpense = asyncHandler(async (req, res) => {
   const payerMembership = members.find((m) => String(m.user) === String(req.user._id));
   const payerIncludedInSplit = splitMembers.some((m) => String(m.user) === String(req.user._id));
 
+  // Saving splitAmong array to the transaction so we can populate names in the UI
   const txn = await Transaction.create({
     owner: req.user._id,
     community: community._id,
@@ -226,10 +228,9 @@ exports.addSplitExpense = asyncHandler(async (req, res) => {
     amount,
     description,
     status: 'completed',
+    splitAmong: splitMembers.map((m) => m.user) 
   });
 
-  // The payer fronted the full amount out of pocket — that always counts as a contribution,
-  // whether or not the payer is one of the people the cost is being split among.
   if (payerMembership) {
     payerMembership.totalContributed += Number(amount);
   }
@@ -238,18 +239,14 @@ exports.addSplitExpense = asyncHandler(async (req, res) => {
     splitMembers.map(async (m) => {
       const isPayer = String(m.user) === String(req.user._id);
       if (isPayer) {
-        m.totalOwed -= amount - shareAmount; // payer already covered their own share by paying upfront
+        m.totalOwed -= amount - shareAmount;
         return m.save();
       }
-      m.totalOwed += shareAmount; // this member now owes the payer their share
+      m.totalOwed += shareAmount; 
       return m.save();
     })
   );
 
-  // If the payer fronted the money but isn't one of the people splitting the cost
-  // (e.g. paid entirely on behalf of others), they're owed the full amount back.
-  // (If the payer IS in splitMembers, they're the same document instance already
-  // saved inside the loop above, so no extra save is needed here.)
   if (payerMembership && !payerIncludedInSplit) {
     payerMembership.totalOwed -= Number(amount);
     await payerMembership.save();
@@ -258,9 +255,6 @@ exports.addSplitExpense = asyncHandler(async (req, res) => {
   ApiResponse.success(res, 201, 'Split expense recorded', { transaction: txn, shareAmount, payerIncluded: payerIncludedInSplit });
 });
 
-// @desc    Settle up a member's balance — Owner or Community Admin only.
-// @route   POST /api/communities/:id/settle
-// @access  Private (owner, community-admin)
 exports.settleBalance = asyncHandler(async (req, res) => {
   const { userId, amount } = req.body;
   const community = await Community.findById(req.params.id);
@@ -288,12 +282,8 @@ exports.settleBalance = asyncHandler(async (req, res) => {
   ApiResponse.success(res, 200, 'Settlement recorded', member);
 });
 
-// ---------- Pay Request workflow (member requests -> owner approves) ----------
+// ---------- Pay Request workflow ----------
 
-// @desc    A member requests to pay off some or all of what they owe.
-//          Nothing on the balance sheet changes until the Owner approves it.
-// @route   POST /api/communities/:id/settlement-requests
-// @access  Private (any member with an outstanding balance)
 exports.createSettlementRequest = asyncHandler(async (req, res) => {
   const community = await Community.findById(req.params.id);
   if (!community) return ApiResponse.error(res, 404, 'Community not found');
@@ -317,7 +307,6 @@ exports.createSettlementRequest = asyncHandler(async (req, res) => {
     );
   }
 
-  // Prevent stacking multiple pending requests at once
   const existingPending = await SettlementRequest.findOne({
     community: community._id, fromUser: req.user._id, status: 'pending',
   });
@@ -332,7 +321,7 @@ exports.createSettlementRequest = asyncHandler(async (req, res) => {
   });
 
   await Notification.create({
-    recipient: community.admin, // the community owner
+    recipient: community.admin, 
     type: 'settlement_requested',
     title: 'New Payment Request',
     message: `${req.user.name} wants to pay $${amount.toFixed(2)} toward their balance in "${community.name}".`,
@@ -342,10 +331,6 @@ exports.createSettlementRequest = asyncHandler(async (req, res) => {
   ApiResponse.success(res, 201, 'Payment request sent to the community owner', request);
 });
 
-// @desc    List settlement requests for a community.
-//          Owner sees everyone's requests; a regular member sees only their own.
-// @route   GET /api/communities/:id/settlement-requests
-// @access  Private
 exports.getSettlementRequests = asyncHandler(async (req, res) => {
   const community = await Community.findById(req.params.id);
   if (!community) return ApiResponse.error(res, 404, 'Community not found');
@@ -357,7 +342,7 @@ exports.getSettlementRequests = asyncHandler(async (req, res) => {
   }
 
   const query = { community: community._id };
-  if (!isOwner) query.fromUser = req.user._id; // non-owners only ever see their own requests
+  if (!isOwner) query.fromUser = req.user._id; 
 
   const requests = await SettlementRequest.find(query)
     .populate('fromUser', 'name email avatar')
@@ -368,12 +353,8 @@ exports.getSettlementRequests = asyncHandler(async (req, res) => {
 });
 
 // @desc    Approve or reject a member's payment request — Owner only.
-//          On approval, the requester's totalOwed decreases and totalContributed
-//          increases by exactly the approved amount.
-// @route   PATCH /api/communities/:id/settlement-requests/:requestId
-// @access  Private (community owner)
 exports.respondToSettlementRequest = asyncHandler(async (req, res) => {
-  const { action } = req.body; // 'approve' | 'reject'
+  const { action } = req.body; 
   if (!['approve', 'reject'].includes(action)) {
     return ApiResponse.error(res, 400, 'Action must be "approve" or "reject"');
   }
@@ -395,11 +376,25 @@ exports.respondToSettlementRequest = asyncHandler(async (req, res) => {
     const membership = await getMembership(community._id, request.fromUser);
     if (!membership) return ApiResponse.error(res, 404, 'Member no longer belongs to this community');
 
-    // Clamp defensively in case their balance changed since the request was made
     const payAmount = Math.min(request.amount, Math.max(membership.totalOwed, 0));
     membership.totalOwed -= payAmount;
     membership.totalContributed += payAmount;
     await membership.save();
+
+    // 🌟 CREATE PERSONAL TRANSACTION FOR THE USER WHO PAID 🌟
+    if (payAmount > 0) {
+      await Transaction.create({
+        owner: request.fromUser,
+        community: null, // Forces this to be a strictly personal transaction
+        type: 'expense',
+        category: 'Community Payment',
+        amount: payAmount,
+        description: `Settled community dues for: ${community.name}`,
+        date: new Date(),
+        paymentMode: 'Cash/Transfer',
+        status: 'completed'
+      });
+    }
 
     request.status = 'approved';
   } else {

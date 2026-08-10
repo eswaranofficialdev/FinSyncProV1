@@ -99,9 +99,9 @@ const Reports = () => {
               {report.map((r, i) => (
                 <tr key={i}>
                   <td data-label="Period">{labelFor(r)}</td>
-                  <td data-label="Income">${r.totalIncome.toLocaleString()}</td>
-                  <td data-label="Expense">${r.totalExpense.toLocaleString()}</td>
-                  <td data-label="Net">${(r.totalIncome - r.totalExpense).toLocaleString()}</td>
+                  <td data-label="Income">₹{r.totalIncome.toLocaleString()}</td>
+                  <td data-label="Expense">₹{r.totalExpense.toLocaleString()}</td>
+                  <td data-label="Net">₹{(r.totalIncome - r.totalExpense).toLocaleString()}</td>
                   <td data-label="Transactions">{r.count}</td>
                 </tr>
               ))}

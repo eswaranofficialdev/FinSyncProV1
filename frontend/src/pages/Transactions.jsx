@@ -154,7 +154,7 @@ const Transactions = () => {
                       {t.type === 'income' ? <FaArrowUp /> : <FaArrowDown />} {t.type}
                     </span>
                   </td>
-                  <td data-label="Amount">${t.amount.toLocaleString()}</td>
+                  <td data-label="Amount">₹{t.amount.toLocaleString()}</td>
                   <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY')}</td>
                   <td data-label="Actions">
                     {t.community ? (

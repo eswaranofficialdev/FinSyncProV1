@@ -26,7 +26,7 @@ const AnimatedNumber = ({ value, prefix = '', decimals = 0 }) => {
   return <span>{prefix}{display.toLocaleString(undefined, { maximumFractionDigits: decimals })}</span>;
 };
 
-const StatCard = ({ title, value, prefix = '$', icon, gradient = 'primary', delay = 0, subtitle }) => {
+const StatCard = ({ title, value, prefix = '₹', icon, gradient = 'primary', delay = 0, subtitle }) => {
   return (
     <motion.div
       className={`stat-card glass-card grad-${gradient}`}
