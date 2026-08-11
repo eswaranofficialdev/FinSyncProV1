@@ -25,7 +25,9 @@ const Transactions = () => {
   const [pages, setPages] = useState(1);
   const [submitting, setSubmitting] = useState(false);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    mode: 'onChange'
+  });
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -159,7 +161,7 @@ const Transactions = () => {
                     </span>
                   </td>
                   <td data-label="Amount">₹{t.amount.toLocaleString()}</td>
-                  <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY, hh:mm A')}</td>
+                  <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY')}</td>
                   <td data-label="Actions">
                     {t.community ? (
                       <Link to="/community" className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
@@ -215,7 +217,16 @@ const Transactions = () => {
           </div>
           <div className="form-group">
             <label className="form-label">Amount</label>
-            <input className="form-input" type="number" step="0.01" {...register('amount', { required: 'Amount is required', min: { value: 0.01, message: 'Must be greater than 0' } })} />
+            <input 
+              className="form-input" 
+              type="number" 
+              step="0.01" 
+              {...register('amount', { 
+                required: 'Amount is required', 
+                min: { value: 0.01, message: 'Must be greater than 0' },
+                maxLength: { value:10, message: 'Maximum 10 digits' } 
+              })} 
+            />
             {errors.amount && <span className="form-error">{errors.amount.message}</span>}
           </div>
           <div className="form-group">
@@ -230,7 +241,14 @@ const Transactions = () => {
           </div>
           <div className="form-group">
             <label className="form-label">Description</label>
-            <textarea className="form-input" rows="3" {...register('description')} />
+            <textarea 
+              className="form-input" 
+              rows="3" 
+              {...register('description', {
+                maxLength: { value: 120, message: 'Maximum 120 characters' }
+              })} 
+            />
+            {errors.description && <span className="form-error">{errors.description.message}</span>}
           </div>
         </form>
       </Modal>
