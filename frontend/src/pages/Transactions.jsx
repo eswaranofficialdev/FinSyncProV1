@@ -161,7 +161,7 @@ const Transactions = () => {
                     </span>
                   </td>
                   <td data-label="Amount">₹{t.amount.toLocaleString()}</td>
-                  <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY')}</td>
+                  <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY, hh:mm A',)}</td>
                   <td data-label="Actions">
                     {t.community ? (
                       <Link to="/community" className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
