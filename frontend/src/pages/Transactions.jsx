@@ -23,6 +23,7 @@ const Transactions = () => {
   const [sourceFilter, setSourceFilter] = useState(''); // '', 'personal', 'community'
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -69,6 +70,8 @@ const Transactions = () => {
   };
 
   const onSubmit = async (formData) => {
+    if (submitting) return;
+    setSubmitting(true);
     try {
       if (editing) {
         await api.put(`/transactions/${editing._id}`, formData);
@@ -81,9 +84,10 @@ const Transactions = () => {
       fetchTransactions();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to save transaction');
+    } finally {
+      setSubmitting(false);
     }
   };
-
   const onDelete = async (txn) => {
     if (txn.community) return; // community-linked transactions are managed from the Community page
     if (!window.confirm('Delete this transaction?')) return;
@@ -155,7 +159,7 @@ const Transactions = () => {
                     </span>
                   </td>
                   <td data-label="Amount">₹{t.amount.toLocaleString()}</td>
-                  <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY')}</td>
+                  <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY, hh:mm A')}</td>
                   <td data-label="Actions">
                     {t.community ? (
                       <Link to="/community" className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
@@ -190,7 +194,9 @@ const Transactions = () => {
         footer={
           <>
             <button className="btn btn-outline" onClick={() => setModalOpen(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleSubmit(onSubmit)}>{editing ? 'Update' : 'Create'}</button>
+            <button className="btn btn-primary" onClick={handleSubmit(onSubmit)} disabled={submitting}>
+              {submitting ? 'Saving...' : editing ? 'Update' : 'Create'}
+            </button>
           </>
         }
       >

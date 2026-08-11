@@ -10,46 +10,46 @@ const ApiResponse = require('../utils/apiResponse');
 // @desc    List MY OWN transactions
 // @route   GET /api/transactions
 // @access  Private
-exports.getTransactions = asyncHandler(async (req, res) => {
-  const {
-    type, category, status, community, startDate, endDate,
-    search = '', page = 1, limit = 10, sort = '-date',
-  } = req.query;
+  exports.getTransactions = asyncHandler(async (req, res) => {
+    const {
+      type, category, status, community, startDate, endDate,
+      search = '', page = 1, limit = 10, sort = '-date',
+    } = req.query;
 
-  const query = { owner: req.user._id };
+    const query = { owner: req.user._id };
 
-  if (type) query.type = type;
-  if (category) query.category = category;
-  if (status) query.status = status;
-  if (community) query.community = community;
-  if (startDate || endDate) {
-    query.date = {};
-    if (startDate) query.date.$gte = new Date(startDate);
-    if (endDate) query.date.$lte = new Date(endDate);
-  }
-  if (search) {
-    query.$or = [
-      { description: { $regex: search, $options: 'i' } },
-      { transactionNumber: { $regex: search, $options: 'i' } },
-    ];
-  }
+    if (type) query.type = type;
+    if (category) query.category = category;
+    if (status) query.status = status;
+    if (community) query.community = community;
+    if (startDate || endDate) {
+      query.date = {};
+      if (startDate) query.date.$gte = new Date(startDate);
+      if (endDate) query.date.$lte = new Date(endDate);
+    }
+    if (search) {
+      query.$or = [
+        { description: { $regex: search, $options: 'i' } },
+        { transactionNumber: { $regex: search, $options: 'i' } },
+      ];
+    }
 
-  const skip = (Number(page) - 1) * Number(limit);
-  const [transactions, total] = await Promise.all([
-    Transaction.find(query)
-      .populate('community', 'name')
-      .sort(sort)
-      .skip(skip)
-      .limit(Number(limit)),
-    Transaction.countDocuments(query),
-  ]);
+    const skip = (Number(page) - 1) * Number(limit);
+    const [transactions, total] = await Promise.all([
+      Transaction.find(query)
+        .populate('community', 'name')
+        .sort({ date: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit)),
+      Transaction.countDocuments(query),
+    ]);
 
-  ApiResponse.success(res, 200, 'Transactions fetched', transactions, {
-    total,
-    page: Number(page),
-    pages: Math.ceil(total / limit),
+    ApiResponse.success(res, 200, 'Transactions fetched', transactions, {
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+    });
   });
-});
 
 // @desc    Get a single transaction — owner only
 // @route   GET /api/transactions/:id

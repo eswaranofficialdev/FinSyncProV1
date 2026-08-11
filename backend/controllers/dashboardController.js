@@ -71,7 +71,7 @@ exports.getDashboard = asyncHandler(async (req, res) => {
   ]);
 
   const recentTransactions = await Transaction.find(ownerFilter)
-    .sort('-date')
+    .sort({ date: -1, createdAt: -1 })
     .limit(10)
     .populate('community', 'name');
 

@@ -46,6 +46,7 @@ const Community = () => {
   const [payOpen, setPayOpen] = useState(false);
   const [settlementRequests, setSettlementRequests] = useState([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const { register, handleSubmit, reset } = useForm();
   const splitForm = useForm();
@@ -66,6 +67,8 @@ const Community = () => {
   useEffect(() => { fetchCommunities(); }, [fetchCommunities]);
 
   const onCreate = async (formData) => {
+    if (submitting) return;
+    setSubmitting(true);
     try {
       await api.post('/communities', formData);
       toast.success('Community created — you are the Owner');
@@ -74,6 +77,8 @@ const Community = () => {
       fetchCommunities();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to create community');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -114,10 +119,12 @@ const Community = () => {
   };
 
   const onSplitExpense = async (formData) => {
+    if (submitting) return;
     if (selectedMemberIds.length === 0) {
       toast.error('Select at least one member to split this expense among');
       return;
     }
+    setSubmitting(true);
     try {
       await api.post(`/communities/${detail.community._id}/split-expense`, {
         amount: Number(formData.amount),
@@ -131,6 +138,8 @@ const Community = () => {
       openDetail(detail.community._id);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to add split expense');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -217,6 +226,8 @@ const Community = () => {
   };
 
   const onSubmitPayRequest = async (formData) => {
+    if (submitting) return;
+    setSubmitting(true);
     try {
       const { data } = await api.post(`/communities/${detail.community._id}/settlement-requests`, {
         amount: Number(formData.amount),
@@ -230,6 +241,8 @@ const Community = () => {
       fetchSettlementRequests(detail.community._id);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to send payment request');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -238,7 +251,7 @@ const Community = () => {
       await api.patch(`/communities/${detail.community._id}/settlement-requests/${requestId}`, { action });
       toast.success(action === 'approve' ? 'Payment approved successfully' : 'Payment request rejected');
       fetchSettlementRequests(detail.community._id);
-      openDetail(detail.community._id); 
+      openDetail(detail.community._id);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to respond to request');
     }
@@ -249,13 +262,13 @@ const Community = () => {
     const isOwner = detail.myRole === 'owner';
     const isCommunityAdmin = detail.myRole === 'admin';
     const isSuperAdmin = user?.role === 'superadmin';
-    const canManageMembers = isOwner; 
+    const canManageMembers = isOwner;
     const canAddExpense = isOwner || isCommunityAdmin;
     const canDelete = isOwner || isSuperAdmin;
-    
-    const pendingRequests = isOwner 
-      ? settlementRequests.filter((r) => r.status === 'pending') 
-      : settlementRequests.filter((r) => r.status === 'pending' && r.fromUser?._id === user?._id); 
+
+    const pendingRequests = isOwner
+      ? settlementRequests.filter((r) => r.status === 'pending')
+      : settlementRequests.filter((r) => r.status === 'pending' && r.fromUser?._id === user?._id);
 
     const completedPayments = settlementRequests.filter((r) => r.status === 'approved' || r.status === 'completed');
 
@@ -306,8 +319,8 @@ const Community = () => {
                 {myMembership.totalOwed > 0
                   ? `Owes ₹${myMembership.totalOwed.toFixed(2)}`
                   : myMembership.totalOwed < 0
-                  ? `Owed ₹${Math.abs(myMembership.totalOwed).toFixed(2)}`
-                  : 'All settled up'}
+                    ? `Owed ₹${Math.abs(myMembership.totalOwed).toFixed(2)}`
+                    : 'All settled up'}
               </h2>
             </div>
           )}
@@ -435,7 +448,7 @@ const Community = () => {
                     <tr key={t._id}>
                       <td data-label="Description">
                         {t.description || '(no description)'}
-                        <br/><span className="badge badge-info" style={{ marginTop: 4, display: 'inline-block' }}>{t.category}</span>
+                        <br /><span className="badge badge-info" style={{ marginTop: 4, display: 'inline-block' }}>{t.category}</span>
                       </td>
                       <td data-label="Amount"><strong>₹{t.amount.toLocaleString()}</strong></td>
                       <td data-label="Paid By">{t.owner?.name || 'Unknown'}</td>
@@ -490,7 +503,9 @@ const Community = () => {
           footer={
             <>
               <button className="btn btn-outline" onClick={() => setSplitOpen(false)}>Cancel</button>
-              <button className="btn btn-primary" onClick={splitForm.handleSubmit(onSplitExpense)}>Add Expense</button>
+              <button className="btn btn-primary" onClick={splitForm.handleSubmit(onSplitExpense)} disabled={submitting}>
+                {submitting ? 'Adding...' : 'Add Expense'}
+              </button>
             </>
           }
         >
@@ -528,7 +543,9 @@ const Community = () => {
           footer={
             <>
               <button className="btn btn-outline" onClick={() => setPayOpen(false)}>Cancel</button>
-              <button className="btn btn-primary" onClick={payForm.handleSubmit(onSubmitPayRequest)}>Send Request</button>
+              <button className="btn btn-primary" onClick={payForm.handleSubmit(onSubmitPayRequest)} disabled={submitting}>
+                {submitting ? 'Sending...' : 'Send Request'}
+              </button>
             </>
           }
         >
@@ -642,7 +659,9 @@ const Community = () => {
         footer={
           <>
             <button className="btn btn-outline" onClick={() => setCreateOpen(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleSubmit(onCreate)}>Create</button>
+            <button className="btn btn-primary" onClick={handleSubmit(onCreate)} disabled={submitting}>
+              {submitting ? 'Creating...' : 'Create'}
+            </button>
           </>
         }
       >

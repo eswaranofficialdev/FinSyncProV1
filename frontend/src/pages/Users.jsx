@@ -89,7 +89,7 @@ const Users = () => {
                   <td data-label="Name">{u.name}</td>
                   <td data-label="Email">{u.email}</td>
                   <td data-label="Status"><span className={`badge ${statusBadge(u.status)}`}>{u.status}</span></td>
-                  <td data-label="Last Login">{u.lastLogin ? dayjs(u.lastLogin).format('DD MMM YYYY') : 'Never'}</td>
+                  <td data-label="Last Login">{u.lastLogin ? dayjs(u.lastLogin).format('DD MMM YYYY, hh:mm A') : 'Never'}</td>
                   <td data-label="Actions">
                     <button className="icon-btn" title={u.status === 'suspended' ? 'Activate' : 'Suspend'} onClick={() => toggleStatus(u)}>
                       {u.status === 'suspended' ? <FaCheckCircle /> : <FaBan />}

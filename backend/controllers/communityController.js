@@ -91,7 +91,7 @@ exports.getCommunityTransactions = asyncHandler(async (req, res) => {
   const transactions = await Transaction.find({ community: community._id })
     .populate('owner', 'name email avatar')
     .populate('splitAmong', 'name') // POPULATING INVOLVED MEMBERS
-    .sort('-date');
+    .sort({ date: -1, createdAt: -1 });
 
   ApiResponse.success(res, 200, 'Community transactions fetched', transactions);
 });

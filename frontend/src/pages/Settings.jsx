@@ -87,7 +87,7 @@ const Settings = () => {
           <form onSubmit={passwordForm.handleSubmit(changePassword)}>
             <div className="form-group"><label className="form-label">New Password</label><input className="form-input" type="password" {...passwordForm.register('newPassword', { required: true })} /></div>
             <div className="form-group"><label className="form-label">Confirm Password</label><input className="form-input" type="password" {...passwordForm.register('confirmPassword', { required: true })} /></div>
-            <button className="btn btn-primary"><FaSave /> Update Password</button>
+            <button className="btn btn-primary" disabled={saving}><FaSave /> Update Password</button>
           </form>
         )}
 
