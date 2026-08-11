@@ -56,6 +56,7 @@ const Settings = () => {
      ======================================================== */
 
   const profileForm = useForm({
+    mode: 'onChange',
     defaultValues: {
       name: user?.name || '',
       phone: user?.phone || '',
@@ -83,7 +84,9 @@ const Settings = () => {
      PASSWORD FORM
      ======================================================== */
 
-  const passwordForm = useForm();
+  const passwordForm = useForm({
+    mode: 'onChange',
+  });
 
 
   /* ========================================================
@@ -286,8 +289,15 @@ const Settings = () => {
 
               <input
                 className="form-input"
-                {...profileForm.register('name')}
+                {...profileForm.register('name', {
+                  required: 'Full name is required',
+                  minLength: { value: 3, message: 'Minimum 3 characters required' },
+                  maxLength: { value: 30, message: 'Maximum 30 characters allowed' }
+                })}
               />
+              {profileForm.formState.errors.name && (
+                <span className="form-error">{profileForm.formState.errors.name.message}</span>
+              )}
 
             </div>
 
@@ -300,8 +310,16 @@ const Settings = () => {
 
               <input
                 className="form-input"
-                {...profileForm.register('phone')}
+                type="text"
+                {...profileForm.register('phone', {
+                  minLength: { value: 6, message: 'Minimum 6 digits required' },
+                  maxLength: { value: 10, message: 'Maximum 10 digits allowed' },
+                  pattern: { value: /^[0-9]*$/, message: 'Only numbers allowed' }
+                })}
               />
+              {profileForm.formState.errors.phone && (
+                <span className="form-error">{profileForm.formState.errors.phone.message}</span>
+              )}
 
             </div>
 
@@ -314,8 +332,14 @@ const Settings = () => {
 
               <input
                 className="form-input"
-                {...profileForm.register('location')}
+                {...profileForm.register('location', {
+                  minLength: { value: 3, message: 'Minimum 3 characters required' },
+                  maxLength: { value: 30, message: 'Maximum 30 characters allowed' }
+                })}
               />
+              {profileForm.formState.errors.location && (
+                <span className="form-error">{profileForm.formState.errors.location.message}</span>
+              )}
 
             </div>
 
@@ -328,8 +352,13 @@ const Settings = () => {
 
               <input
                 className="form-input"
-                {...profileForm.register('profession')}
+                {...profileForm.register('profession', {
+                  maxLength: { value: 30, message: 'Maximum 30 characters allowed' }
+                })}
               />
+              {profileForm.formState.errors.profession && (
+                <span className="form-error">{profileForm.formState.errors.profession.message}</span>
+              )}
 
             </div>
 
@@ -343,8 +372,13 @@ const Settings = () => {
               <textarea
                 className="form-input"
                 rows="3"
-                {...profileForm.register('bio')}
+                {...profileForm.register('bio', {
+                  maxLength: { value: 80, message: 'Maximum 80 characters allowed' }
+                })}
               />
+              {profileForm.formState.errors.bio && (
+                <span className="form-error">{profileForm.formState.errors.bio.message}</span>
+              )}
 
             </div>
 

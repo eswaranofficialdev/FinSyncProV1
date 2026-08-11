@@ -577,10 +577,10 @@ const Community = () => {
           title="Add Member"
         >
           <div className="form-group">
-            <label className="form-label">Search by name or email</label>
+            <label className="form-label">Search by UID</label>
             <div className="navbar-search" style={{ maxWidth: '100%' }}>
               <FaSearch />
-              <input placeholder="Start typing..." value={searchQuery} onChange={(e) => handleSearchChange(e.target.value)} />
+              <input type='number' placeholder="Start typing..." value={searchQuery} onChange={(e) => handleSearchChange(e.target.value)} />
               {searchQuery && <FaTimesCircle style={{ cursor: 'pointer' }} onClick={() => handleSearchChange('')} />}
             </div>
           </div>

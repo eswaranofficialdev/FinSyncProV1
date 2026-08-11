@@ -87,9 +87,10 @@ exports.searchUsers = asyncHandler(async (req, res) => {
     $or: [
       { name: { $regex: q, $options: 'i' } },
       { email: { $regex: q, $options: 'i' } },
+      { uid: { $regex: q, $options: 'i' } },
     ],
   })
-    .select('name email avatar')
+    .select('name email uid')
     .limit(10);
 
   ApiResponse.success(res, 200, 'Search results', users);
