@@ -87,7 +87,7 @@
   .navbar { top: 12px; margin: 12px 12px 0; }
   .mobile-only { display: flex; }
   .navbar-left .icon-btn:first-child { display: none; }
-  .navbar-search { display: none; }
+  /* .navbar-search { display: none; } */
   .profile-meta { display: none; }
 }
 
