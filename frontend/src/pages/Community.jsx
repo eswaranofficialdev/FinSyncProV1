@@ -27,7 +27,7 @@ const Community = () => {
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false); 
+  const [editOpen, setEditOpen] = useState(false);
 
   const [detail, setDetail] = useState(null);
   const [communityTxns, setCommunityTxns] = useState([]);
@@ -49,13 +49,13 @@ const Community = () => {
 
   // Filter States
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM'));
-  const [activeTab, setActiveTab] = useState('expenses'); 
+  const [activeTab, setActiveTab] = useState('expenses');
   const [showReport, setShowReport] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors: createErrors } } = useForm({ mode: 'onChange' });
   const splitForm = useForm({ mode: 'onChange' });
   const payForm = useForm();
-  const editForm = useForm({ mode: 'onChange' }); 
+  const editForm = useForm({ mode: 'onChange' });
 
   const fetchCommunities = useCallback(async () => {
     setLoading(true);
@@ -116,7 +116,7 @@ const Community = () => {
       const { data } = await api.get(`/communities/${id}`);
       setDetail(data.data);
       setSelectedMemberIds(data.data.members.map((m) => m.user?._id));
-      setShowReport(false); 
+      setShowReport(false);
       fetchCommunityTransactions(id, selectedMonth);
       fetchSettlementRequests(id, selectedMonth);
     } catch (err) {
@@ -256,8 +256,8 @@ const Community = () => {
   };
 
   const myMembership = detail?.members.find((m) => m.user?._id === user?._id);
-  const myPayableRaw = myMembership 
-    ? (myMembership.totalOwed + (myMembership.totalReceived || 0)) - (myMembership.totalContributed + (myMembership.totalPaid || 0)) 
+  const myPayableRaw = myMembership
+    ? (myMembership.totalOwed + (myMembership.totalReceived || 0)) - (myMembership.totalContributed + (myMembership.totalPaid || 0))
     : 0;
   const myPayable = Math.max(0, myPayableRaw);
 
@@ -359,12 +359,12 @@ const Community = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <h1 style={{ margin: 0 }}>{detail.community.name}</h1>
                   {isOwner && (
-                    <button 
-                      className="icon-btn" 
+                    <button
+                      className="icon-btn"
                       onClick={() => {
                         editForm.reset({ name: detail.community.name, description: detail.community.description });
                         setEditOpen(true);
-                      }} 
+                      }}
                       title="Edit Community"
                     >
                       <FaEdit style={{ color: 'var(--color-primary)' }} />
@@ -378,9 +378,9 @@ const Community = () => {
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: 8 }}>
                     <FaCalendarAlt size={14} color="var(--color-primary)" />
-                    <input 
-                      type="month" 
-                      value={selectedMonth} 
+                    <input
+                      type="month"
+                      value={selectedMonth}
                       onChange={(e) => setSelectedMonth(e.target.value)}
                       style={{ border: 'none', background: 'transparent', color: 'inherit', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
                     />
@@ -443,8 +443,8 @@ const Community = () => {
                       <div key={r._id} className="settlement-request-item">
                         <div>
                           <p className="notif-title" style={{ fontSize: '0.9rem' }}>
-                            {isRecipient 
-                              ? `${r.fromUser?.name || 'A member'} wants to pay you` 
+                            {isRecipient
+                              ? `${r.fromUser?.name || 'A member'} wants to pay you`
                               : `You requested to pay ${r.toUser?.name || 'a member'}`}
                           </p>
                           <p className="page-subtitle" style={{ fontSize: '0.8rem' }}>Amount: <strong>₹{r.amount.toFixed(2)}</strong></p>
@@ -463,9 +463,9 @@ const Community = () => {
                           ) : (
                             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                               <span className="badge badge-warning">Waiting for Approval</span>
-                              <button 
-                                className="btn btn-outline" 
-                                style={{ padding: '6px 12px', fontSize: '0.75rem', borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }} 
+                              <button
+                                className="btn btn-outline"
+                                style={{ padding: '6px 12px', fontSize: '0.75rem', borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}
                                 onClick={() => cancelRequest(r._id)}
                                 title="Cancel Request"
                               >
@@ -485,7 +485,7 @@ const Community = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <h3 style={{ margin: 0 }}>Members & Balance Sheet</h3>
                 <button className="btn btn-outline" onClick={() => setShowReport(true)} style={{ fontSize: '0.85rem', padding: '6px 12px' }}>
-                  <FaReceipt style={{ marginRight: 6 }}/> Monthly Report
+                  <FaReceipt style={{ marginRight: 6 }} /> Monthly Report
                 </button>
               </div>
               <div className="table-wrap">
@@ -563,17 +563,17 @@ const Community = () => {
             </div>
 
             <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
-              <button 
+              <button
                 className={`btn ${activeTab === 'expenses' ? 'btn-primary' : 'btn-outline'}`}
                 onClick={() => setActiveTab('expenses')}
               >
-                <FaReceipt style={{ marginRight: 6 }}/> Community Expenses
+                <FaReceipt style={{ marginRight: 6 }} /> Community Expenses
               </button>
-              <button 
+              <button
                 className={`btn ${activeTab === 'payments' ? 'btn-primary' : 'btn-outline'}`}
                 onClick={() => setActiveTab('payments')}
               >
-                <FaHistory style={{ marginRight: 6 }}/> Paid Transactions
+                <FaHistory style={{ marginRight: 6 }} /> Paid Transactions
               </button>
             </div>
 
@@ -602,7 +602,7 @@ const Community = () => {
                         const involvedCount = t.splitAmong?.length || 1;
                         const splitPerPerson = (t.amount / involvedCount).toFixed(2);
                         const involvedNames = t.splitAmong?.map(u => u.name || 'Unknown').join(', ') || `${involvedCount} members`;
-                        
+
                         const canDeleteTxn = dayjs().diff(dayjs(t.createdAt), 'minute') <= 5;
 
                         return (
@@ -688,9 +688,9 @@ const Community = () => {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: 8 }}>
                 <FaCalendarAlt size={14} color="var(--color-primary)" />
-                <input 
-                  type="month" 
-                  value={selectedMonth} 
+                <input
+                  type="month"
+                  value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
                   style={{ border: 'none', background: 'transparent', color: 'inherit', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
                 />
@@ -723,7 +723,7 @@ const Community = () => {
                         .reduce((sum, t) => sum + (t.amount / (t.splitAmong?.length || 1)), 0);
 
                       const expense = owes - spend;
-                      
+
                       return (
                         <tr key={m._id}>
                           <td data-label="Name">{m.user?.name}</td>
@@ -742,7 +742,7 @@ const Community = () => {
 
             <div className="glass-card" style={{ padding: 20 }}>
               <h3 style={{ marginBottom: 16 }}>Settlements & Payments ({dayjs(selectedMonth).format('MMMM YYYY')})</h3>
-              
+
               {requestsLoading ? (
                 <p style={{ textAlign: 'center', margin: 20 }}>Loading payment history...</p>
               ) : currentMonthPayments.length === 0 ? (
@@ -787,7 +787,7 @@ const Community = () => {
         )}
 
         {/* --- MODALS --- */}
-        
+
         {/* Edit Community Modal */}
         <Modal
           isOpen={editOpen}
@@ -805,13 +805,13 @@ const Community = () => {
           <form onSubmit={editForm.handleSubmit(onEditCommunity)}>
             <div className="form-group">
               <label className="form-label">Name</label>
-              <input 
-                className="form-input" 
-                {...editForm.register('name', { 
+              <input
+                className="form-input"
+                {...editForm.register('name', {
                   required: 'Community name is required',
                   minLength: { value: 3, message: 'Minimum 3 characters required' },
                   maxLength: { value: 20, message: 'Maximum 20 characters allowed' }
-                })} 
+                })}
               />
               {/* 🌟 VALIDATION ADDED FOR EDIT NAME */}
               {editForm.formState.errors.name && (
@@ -820,18 +820,24 @@ const Community = () => {
             </div>
             <div className="form-group">
               <label className="form-label">Description</label>
-              <textarea 
-                className="form-input" 
-                rows="3" 
-                {...editForm.register('description', {
-                  required: 'Description is required',
-                  minLength: { value: 3, message: 'Minimum 3 characters required' },
-                  maxLength: { value: 50, message: 'Maximum 50 characters allowed' }
-                })} 
+              <input
+                className="form-input"
+                {...splitForm.register('description', {
+                  maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
+                  // 🌟 ADD THIS VALIDATION BLOCK HERE 🌟
+                  validate: (value) => {
+                    const text = value?.trim() || '';
+                    if (!text) return true;
+                    const hasLongWord = /\S{20,}/.test(text);
+                    if (hasLongWord) {
+                      return 'Please add spaces between words.';
+                    }
+                    return true;
+                  }
+                })}
               />
-              {/* 🌟 VALIDATION ADDED FOR EDIT DESCRIPTION */}
-              {editForm.formState.errors.description && (
-                <span className="form-error">{editForm.formState.errors.description.message}</span>
+              {splitForm.formState.errors.description && (
+                <span className="form-error">{splitForm.formState.errors.description.message}</span>
               )}
             </div>
           </form>
@@ -854,15 +860,15 @@ const Community = () => {
           <form onSubmit={splitForm.handleSubmit(onSplitExpense)}>
             <div className="form-group">
               <label className="form-label">Amount</label>
-              <input 
-                className="form-input" 
-                type="number" 
-                step="0.01" 
-                {...splitForm.register('amount', { 
-                  required: 'Amount is required', 
+              <input
+                className="form-input"
+                type="number"
+                step="0.01"
+                {...splitForm.register('amount', {
+                  required: 'Amount is required',
                   min: { value: 1, message: 'Minimum amount is 1' },
                   max: { value: 999999, message: 'Maximum 6 digits allowed' }
-                })} 
+                })}
               />
               {splitForm.formState.errors.amount && (
                 <span className="form-error">{splitForm.formState.errors.amount.message}</span>
@@ -878,11 +884,11 @@ const Community = () => {
 
             <div className="form-group">
               <label className="form-label">Description</label>
-              <input 
-                className="form-input" 
+              <input
+                className="form-input"
                 {...splitForm.register('description', {
                   maxLength: { value: 50, message: 'Maximum 50 characters allowed' }
-                })} 
+                })}
               />
               {splitForm.formState.errors.description && (
                 <span className="form-error">{splitForm.formState.errors.description.message}</span>
@@ -928,7 +934,7 @@ const Community = () => {
 
             <div className="form-group">
               <label className="form-label">Select Creditor (Payee)</label>
-              <select 
+              <select
                 className="form-input"
                 value={selectedPayeeId}
                 onChange={(e) => setSelectedPayeeId(e.target.value)}
@@ -940,8 +946,8 @@ const Community = () => {
                     const rawPayable = (m.totalOwed + (m.totalReceived || 0)) - (m.totalContributed + (m.totalPaid || 0));
                     const isCreditor = rawPayable < 0;
                     return (
-                      <option 
-                        key={m.user?._id} 
+                      <option
+                        key={m.user?._id}
                         value={m.user?._id}
                       >
                         {m.user?.name} {isCreditor ? `(Collects ₹${Math.abs(rawPayable).toFixed(2)})` : '(No money to collect)'}
@@ -1068,13 +1074,13 @@ const Community = () => {
         <form onSubmit={handleSubmit(onCreate)}>
           <div className="form-group">
             <label className="form-label">Name</label>
-            <input 
-              className="form-input" 
-              {...register('name', { 
+            <input
+              className="form-input"
+              {...register('name', {
                 required: 'Community name is required',
                 minLength: { value: 3, message: 'Minimum 3 characters required' },
                 maxLength: { value: 20, message: 'Maximum 20 characters allowed' }
-              })} 
+              })}
             />
             {createErrors.name && (
               <span className="form-error">{createErrors.name.message}</span>
@@ -1090,14 +1096,14 @@ const Community = () => {
 
           <div className="form-group">
             <label className="form-label">Description</label>
-            <textarea 
-              className="form-input" 
-              rows="3" 
+            <textarea
+              className="form-input"
+              rows="3"
               {...register('description', {
                 required: 'Description is required',
                 minLength: { value: 3, message: 'Minimum 3 characters required' },
                 maxLength: { value: 30, message: 'Maximum 30 characters allowed' }
-              })} 
+              })}
             />
             {createErrors.description && (
               <span className="form-error">{createErrors.description.message}</span>

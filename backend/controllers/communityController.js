@@ -440,16 +440,21 @@ exports.respondToSettlementRequest = asyncHandler(async (req, res) => {
 
   if (action === 'approve') {
     const payerMembership = await getMembership(community._id, request.fromUser);
-    const payeeMembership = await getMembership(community._id, request.toUser);
+    // Populate the user so we can get their name for the transaction description
+    const payeeMembership = await getMembership(community._id, request.toUser).populate('user', 'name');
 
     if (!payerMembership || !payeeMembership) return ApiResponse.error(res, 404, 'Member no longer belongs to this community');
 
     const payAmount = request.amount;
 
-    payerMembership.totalPaid += payAmount;
+    // 🌟 DIRECTLY DEDUCT FROM LIFETIME BALANCES 🌟
+    
+    // 1. Sender (Payer): Reduces their totalOwed (Lowers their Payable amount)
+    payerMembership.totalOwed -= payAmount;
     await payerMembership.save();
 
-    payeeMembership.totalReceived += payAmount;
+    // 2. Receiver (Payee): Increases their totalOwed (Lowers their negative Collect amount closer to 0)
+    payeeMembership.totalOwed += payAmount;
     await payeeMembership.save();
 
     const randomTxnNumber = `TXN-${Math.floor(100000 + Math.random() * 900000)}`;
