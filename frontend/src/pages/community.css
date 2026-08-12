@@ -8,33 +8,24 @@ input, textarea, select, [contenteditable="true"] {
   caret-color: var(--color-primary, #4F46E5); 
 }
 
-/* Fix table display wrap for long member lists */
+/* --- Table Display & Responsive Wrappers --- */
 .table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 td[data-label="Involved Members"] {
-  max-width: 250px;
+  max-width: 100%;
   white-space: normal;
   line-height: 1.4;
+  word-break: break-word;
 }
 
-/* ... keep the rest of your original community.css below here ... */
-
+/* --- Community Grid & Cards --- */
 .community-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 18px;
-}
-
-@media (max-width: 480px) {
-  .community-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-  .community-card { padding: 16px; }
-}
-
-@media (max-width: 360px) {
-  .community-grid { grid-template-columns: 1fr; }
 }
 
 .community-card {
@@ -54,8 +45,13 @@ td[data-label="Involved Members"] {
   margin-bottom: 12px;
 }
 
-.community-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+.community-card h3 { 
+  font-size: 1.05rem; 
+  font-weight: 700; 
+  margin-bottom: 6px; 
+}
 
+/* --- Member Checklists & Selection --- */
 .member-checklist {
   display: flex;
   flex-direction: column;
@@ -74,8 +70,14 @@ td[data-label="Involved Members"] {
   font-size: 0.88rem;
   cursor: pointer;
 }
-.member-check-item input { accent-color: var(--color-primary); width: 16px; height: 16px; }
 
+.member-check-item input { 
+  accent-color: var(--color-primary); 
+  width: 16px; 
+  height: 16px; 
+}
+
+/* --- Search Results --- */
 .search-results-list {
   display: flex;
   flex-direction: column;
@@ -92,9 +94,10 @@ td[data-label="Involved Members"] {
   gap: 12px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  background: rgba(148,163,184,0.08);
+  background: rgba(148, 163, 184, 0.08);
 }
 
+/* --- Settlement Requests --- */
 .settlement-request-list {
   display: flex;
   flex-direction: column;
@@ -113,24 +116,47 @@ td[data-label="Involved Members"] {
   flex-wrap: wrap;
 }
 
-.split-txn-list { display: flex; flex-direction: column; gap: 14px; }
+/* --- Split Transactions --- */
+.split-txn-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 14px; 
+}
+
 .split-txn-card {
   background: rgba(255, 255, 255, 0.5);
   border-radius: 14px;
   padding: 16px 18px;
 }
-.split-txn-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-.split-txn-total { font-weight: 700; font-size: 1.05rem; white-space: nowrap; }
 
-/* Add to community.css if missing */
-.table-wrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+.split-txn-header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: flex-start; 
+  gap: 12px; 
 }
 
-td[data-label="Involved Members"] {
-  max-width: 100%;
-  white-space: normal;
-  line-height: 1.4;
+.split-txn-total { 
+  font-weight: 700; 
+  font-size: 1.05rem; 
+  white-space: nowrap; 
 }
+
+/* --- Responsive Media Queries --- */
+@media (max-width: 480px) {
+  .community-grid { 
+    grid-template-columns: 1fr 1fr; 
+    gap: 12px; 
+  }
+  .community-card { 
+    padding: 16px; 
+  }
+}
+
+@media (max-width: 360px) {
+  .community-grid { 
+    grid-template-columns: 1fr; 
+  }
+}
+
 

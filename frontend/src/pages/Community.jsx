@@ -388,12 +388,16 @@ const Community = () => {
                     {detail.community.type} · {detail.members.length} members
                     {isSuperAdmin && !isOwner && !isCommunityAdmin && <span className="badge badge-warning" style={{ marginLeft: 10 }}>Oversight View</span>}
                   </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(58, 58, 73, 0.1)', padding: '4px 8px', borderRadius: 8 }}>
                     <FaCalendarAlt size={14} color="var(--color-primary)" />
                     <input
                       type="month"
                       value={selectedMonth}
-                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setSelectedMonth(e.target.value);
+                        }
+                      }}
                       style={{ border: 'none', background: 'transparent', color: 'inherit', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
                     />
                   </div>
@@ -703,8 +707,14 @@ const Community = () => {
                 <input
                   type="month"
                   value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  style={{ border: 'none', background: 'transparent', color: 'inherit', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    if (value) {
+                      setSelectedMonth(value);
+                    }
+                  }}
+                  style={{border: 'none',background: 'transparent',color: 'inherit', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
                 />
               </div>
             </div>
@@ -753,39 +763,39 @@ const Community = () => {
             </div>
 
             <div className="glass-card" style={{ padding: 20 }}>
-  <h3 style={{ marginBottom: 16 }}>Settlements & Payments ({dayjs(selectedMonth).format('MMMM YYYY')})</h3>
+              <h3 style={{ marginBottom: 16 }}>Settlements & Payments ({dayjs(selectedMonth).format('MMMM YYYY')})</h3>
 
-  {requestsLoading ? (
-    <p style={{ textAlign: 'center', margin: 20 }}>Loading payment history...</p>
-  ) : currentMonthPayments.length === 0 ? (
-    <p style={{ textAlign: 'center', color: 'var(--text-secondary)', margin: 20 }}>No payments recorded for this month.</p>
-  ) : (
-    <div className="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Paid By</th>
-            <th>Paid To</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentMonthPayments.map(p => (
-            <tr key={p._id}>
-              <td data-label="Date">{dayjs(p.updatedAt || p.createdAt).format('DD MMM, hh:mm A')}</td>
-              <td data-label="Paid By"><strong>{p.fromUser?.name || 'Unknown'}</strong></td>
-              <td data-label="Paid To"><strong>{p.toUser?.name || 'Community Creditor'}</strong></td>
-              <td data-label="Amount" style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
-                ₹{p.amount.toFixed(2)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )}
-</div>
+              {requestsLoading ? (
+                <p style={{ textAlign: 'center', margin: 20 }}>Loading payment history...</p>
+              ) : currentMonthPayments.length === 0 ? (
+                <p style={{ textAlign: 'center', color: 'var(--text-secondary)', margin: 20 }}>No payments recorded for this month.</p>
+              ) : (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Paid By</th>
+                        <th>Paid To</th>
+                        <th>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentMonthPayments.map(p => (
+                        <tr key={p._id}>
+                          <td data-label="Date">{dayjs(p.updatedAt || p.createdAt).format('DD MMM, hh:mm A')}</td>
+                          <td data-label="Paid By"><strong>{p.fromUser?.name || 'Unknown'}</strong></td>
+                          <td data-label="Paid To"><strong>{p.toUser?.name || 'Community Creditor'}</strong></td>
+                          <td data-label="Amount" style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
+                            ₹{p.amount.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
 

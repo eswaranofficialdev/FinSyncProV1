@@ -68,7 +68,7 @@ const Dashboard = () => {
             <tbody>
               {recentTransactions.map((t) => (
                 <tr key={t._id}>
-                  <td data-label="Description">{t.description || t.transactionNumber}</td>
+                  <td data-label="Description">{t.description || "-"}</td>
                   <td data-label="Category">{t.category}</td>
                   <td data-label="Type">
                     <span className={`badge ${t.type === 'income' ? 'badge-success' : 'badge-danger'}`}>
