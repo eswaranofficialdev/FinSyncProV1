@@ -52,6 +52,26 @@ const Community = () => {
   const [activeTab, setActiveTab] = useState('expenses');
   const [showReport, setShowReport] = useState(false);
 
+  // Custom Confirmation Modal State
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    title: 'Confirm Action',
+    message: '',
+    onConfirm: () => {},
+  });
+
+  const confirm = (message, onConfirm, title = 'Are you sure?') => {
+    setConfirmConfig({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        onConfirm();
+        setConfirmConfig((prev) => ({ ...prev, isOpen: false }));
+      },
+    });
+  };
+
   const { register, handleSubmit, reset, formState: { errors: createErrors } } = useForm({ mode: 'onChange' });
   const splitForm = useForm({ mode: 'onChange' });
   const payForm = useForm();
@@ -174,28 +194,30 @@ const Community = () => {
   };
 
   const onDeleteTransaction = async (txnId) => {
-    if (!window.confirm('Delete this community transaction? Split shares and balances will be successfully reversed.')) return;
-    try {
-      await api.delete(`/communities/transactions/${txnId}`);
-      toast.success('Transaction deleted and balances recalculated');
-      openDetail(detail.community._id);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to delete transaction');
-    }
+    confirm(
+      'Delete this community transaction? Split shares and balances will be successfully reversed.',
+      async () => {
+        try {
+          await api.delete(`/communities/transactions/${txnId}`);
+          toast.success('Transaction deleted and balances recalculated');
+          openDetail(detail.community._id);
+        } catch (err) {
+          toast.error(err.response?.data?.message || 'Failed to delete transaction');
+        }
+      },
+      'Delete Transaction'
+    );
   };
 
   const toggleSelectedMember = (id) => {
     setSelectedMemberIds((prev) => {
-      // If the ID is already selected, allow them to deselect it
       if (prev.includes(id)) {
         return prev.filter((x) => x !== id);
       }
-      // If they already have 10 selected, block adding another and notify
       if (prev.length >= 10) {
         toast.warning('You can select a maximum of 10 members only.');
         return prev;
       }
-      // Otherwise, add the new member
       return [...prev, id];
     });
   };
@@ -235,14 +257,19 @@ const Community = () => {
   };
 
   const onRemoveMember = async (memberUserId, memberName) => {
-    if (!window.confirm(`Remove ${memberName} from this community?`)) return;
-    try {
-      await api.delete(`/communities/${detail.community._id}/members/${memberUserId}`);
-      toast.success('Member removed');
-      openDetail(detail.community._id);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to remove member');
-    }
+    confirm(
+      `Remove ${memberName} from this community?`,
+      async () => {
+        try {
+          await api.delete(`/communities/${detail.community._id}/members/${memberUserId}`);
+          toast.success('Member removed');
+          openDetail(detail.community._id);
+        } catch (err) {
+          toast.error(err.response?.data?.message || 'Failed to remove member');
+        }
+      },
+      'Remove Member'
+    );
   };
 
   const onChangeRole = async (memberUserId, role) => {
@@ -256,15 +283,20 @@ const Community = () => {
   };
 
   const onDeleteCommunity = async () => {
-    if (!window.confirm(`Delete "${detail.community.name}"? This removes all its transactions and cannot be undone.`)) return;
-    try {
-      await api.delete(`/communities/${detail.community._id}`);
-      toast.success('Community deleted');
-      setDetail(null);
-      fetchCommunities();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to delete community');
-    }
+    confirm(
+      `Delete "${detail.community.name}"? This removes all its transactions and cannot be undone.`,
+      async () => {
+        try {
+          await api.delete(`/communities/${detail.community._id}`);
+          toast.success('Community deleted');
+          setDetail(null);
+          fetchCommunities();
+        } catch (err) {
+          toast.error(err.response?.data?.message || 'Failed to delete community');
+        }
+      },
+      'Delete Community'
+    );
   };
 
   const myMembership = detail?.members.find((m) => m.user?._id === user?._id);
@@ -327,14 +359,19 @@ const Community = () => {
   };
 
   const cancelRequest = async (requestId) => {
-    if (!window.confirm('Are you sure you want to cancel this payment request?')) return;
-    try {
-      await api.delete(`/communities/${detail.community._id}/settlement-requests/${requestId}`);
-      toast.success('Payment request cancelled');
-      fetchSettlementRequests(detail.community._id);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to cancel request');
-    }
+    confirm(
+      'Are you sure you want to cancel this payment request?',
+      async () => {
+        try {
+          await api.delete(`/communities/${detail.community._id}/settlement-requests/${requestId}`);
+          toast.success('Payment request cancelled');
+          fetchSettlementRequests(detail.community._id);
+        } catch (err) {
+          toast.error(err.response?.data?.message || 'Failed to cancel request');
+        }
+      },
+      'Cancel Request'
+    );
   };
 
   // ---------- Detail view ----------
@@ -347,16 +384,10 @@ const Community = () => {
     const canDelete = isOwner || isSuperAdmin;
     const canManageTransactions = isOwner || isCommunityAdmin;
 
-    // 🌟 BULLETPROOF FRONTEND FILTERING: Guarantees dynamic math works!
     const currentMonthTxns = communityTxns.filter(t => dayjs(t.date).format('YYYY-MM') === selectedMonth);
     const monthlyTotalExpense = currentMonthTxns.reduce((sum, t) => sum + t.amount, 0);
 
-    const pendingRequests = settlementRequests.filter((r) => {
-      if (r.status !== 'pending') return false;
-      const isSender = r.fromUser?._id === user?._id;
-      const isRecipient = r.toUser?._id === user?._id;
-      return isSender || isRecipient;
-    });
+    const pendingRequests = settlementRequests.filter((r) => r.status === 'pending');
 
     const completedPayments = settlementRequests.filter((r) => r.status === 'approved' || r.status === 'completed');
     const currentMonthPayments = completedPayments.filter(p => dayjs(p.updatedAt || p.createdAt).format('YYYY-MM') === selectedMonth);
@@ -521,7 +552,6 @@ const Community = () => {
                       const isNegative = rawPayable < 0;
                       const displayPayable = Math.max(0, rawPayable);
 
-                      // Filtered dynamically using the strict currentMonth array
                       const monthlySpent = currentMonthTxns
                         .filter(t => (t.owner?._id || t.owner) === m.user?._id)
                         .reduce((sum, t) => sum + t.amount, 0);
@@ -646,7 +676,7 @@ const Community = () => {
                               </td>
                             )}
                           </tr>
-                        )
+                        );
                       })}
                     </tbody>
                   </table>
@@ -709,12 +739,11 @@ const Community = () => {
                   value={selectedMonth}
                   onChange={(e) => {
                     const value = e.target.value;
-
                     if (value) {
                       setSelectedMonth(value);
                     }
                   }}
-                  style={{border: 'none',background: 'transparent',color: 'inherit', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
+                  style={{ border: 'none', background: 'transparent', color: 'inherit', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
                 />
               </div>
             </div>
@@ -735,7 +764,6 @@ const Community = () => {
                     {txnLoading ? (
                       <tr><td colSpan="4" style={{ textAlign: 'center' }}>Loading month data...</td></tr>
                     ) : detail.members.map((m) => {
-                      // Uses strict frontend date filtering
                       const spend = currentMonthTxns
                         .filter(t => (t.owner?._id || t.owner) === m.user?._id)
                         .reduce((sum, t) => sum + t.amount, 0);
@@ -755,7 +783,7 @@ const Community = () => {
                             {expense > 0 ? `Owes ₹${expense.toFixed(2)}` : expense < 0 ? `Collects ₹${Math.abs(expense).toFixed(2)}` : '₹0.00'}
                           </td>
                         </tr>
-                      )
+                      );
                     })}
                   </tbody>
                 </table>
@@ -801,6 +829,27 @@ const Community = () => {
 
         {/* --- MODALS --- */}
 
+        {/* Custom Confirmation Modal Component */}
+        <Modal
+          isOpen={confirmConfig.isOpen}
+          onClose={() => setConfirmConfig((prev) => ({ ...prev, isOpen: false }))}
+          title={confirmConfig.title}
+          footer={
+            <>
+              <button className="btn btn-outline" onClick={() => setConfirmConfig((prev) => ({ ...prev, isOpen: false }))}>
+                Cancel
+              </button>
+              <button className="btn btn-danger" onClick={confirmConfig.onConfirm}>
+                Confirm
+              </button>
+            </>
+          }
+        >
+          <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-main, #333)', lineHeight: 1.5 }}>
+            {confirmConfig.message}
+          </p>
+        </Modal>
+
         {/* Edit Community Modal */}
         <Modal
           isOpen={editOpen}
@@ -833,7 +882,6 @@ const Community = () => {
 
             <div className="form-group">
               <label className="form-label">Description</label>
-              {/* 🌟 Ensure this is a <textarea> and uses editForm.register('description') */}
               <textarea
                 className="form-input"
                 rows="3"
@@ -894,7 +942,16 @@ const Community = () => {
               <input
                 className="form-input"
                 {...splitForm.register('description', {
-                  maxLength: { value: 50, message: 'Maximum 50 characters allowed' }
+                  maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
+                  validate: (value) => {
+                    const text = value?.trim() || '';
+                    if (!text) return true;
+                    const hasLongWord = /\S{20,}/.test(text);
+                    if (hasLongWord) {
+                      return 'Please add spaces between words.';
+                    }
+                    return true;
+                  }
                 })}
               />
               {splitForm.formState.errors.description && (

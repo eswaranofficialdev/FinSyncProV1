@@ -2,12 +2,14 @@
    TRANSACTIONS PAGE
 ========================================================= */
 
+
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
+
 
 import {
   FaPlus,
@@ -20,14 +22,17 @@ import {
   FaLock,
 } from 'react-icons/fa';
 
+
 import api from '../services/api';
 import Modal from '../components/Modal';
 import './listPage.css';
 
 
+
 /* =========================================================
    CONSTANTS
 ========================================================= */
+
 
 const CATEGORIES = [
   'Salary',
@@ -45,6 +50,7 @@ const CATEGORIES = [
   'Others',
 ];
 
+
 const TYPES = [
   'income',
   'expense',
@@ -52,6 +58,7 @@ const TYPES = [
   'loan',
   'savings',
 ];
+
 
 const PAYMENT_MODES = [
   'Cash',
@@ -63,35 +70,65 @@ const PAYMENT_MODES = [
 ];
 
 
+
 /* =========================================================
    COMPONENT
 ========================================================= */
 
+
 const Transactions = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+
 
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+
+  // Custom Confirmation Modal State
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    title: 'Confirm Action',
+    message: '',
+    onConfirm: () => {},
+  });
+
+  const confirm = (message, onConfirm, title = 'Are you sure?') => {
+    setConfirmConfig({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        onConfirm();
+        setConfirmConfig((prev) => ({ ...prev, isOpen: false }));
+      },
+    });
+  };
+
 
   const [search, setSearch] = useState(
     searchParams.get('search') || ''
   );
 
+
   const [typeFilter, setTypeFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState('');
+
 
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
 
+
   const [submitting, setSubmitting] = useState(false);
+
 
 
   /* =======================================================
      REACT HOOK FORM
   ======================================================= */
+
 
   const {
     register,
@@ -103,12 +140,15 @@ const Transactions = () => {
   });
 
 
+
   /* =======================================================
      FETCH TRANSACTIONS
   ======================================================= */
 
+
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
+
 
     try {
       const { data } = await api.get('/transactions', {
@@ -120,15 +160,19 @@ const Transactions = () => {
         },
       });
 
+
       let rows = data.data;
+
 
       if (sourceFilter === 'personal') {
         rows = rows.filter((t) => !t.community);
       }
 
+
       if (sourceFilter === 'community') {
         rows = rows.filter((t) => !!t.community);
       }
+
 
       setTransactions(rows);
       setPages(data.meta.pages);
@@ -140,18 +184,22 @@ const Transactions = () => {
   }, [search, typeFilter, sourceFilter, page]);
 
 
+
   /* =======================================================
      LOAD TRANSACTIONS
   ======================================================= */
+
 
   useEffect(() => {
     fetchTransactions();
   }, [fetchTransactions]);
 
 
+
   /* =======================================================
      SYNC SEARCH WITH URL
   ======================================================= */
+
 
   useEffect(() => {
     if (search) {
@@ -160,16 +208,20 @@ const Transactions = () => {
       setSearchParams({});
     }
 
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
+
 
 
   /* =======================================================
      OPEN CREATE MODAL
   ======================================================= */
 
+
   const openCreate = () => {
     setEditing(null);
+
 
     reset({
       type: 'expense',
@@ -180,18 +232,23 @@ const Transactions = () => {
       paymentMode: 'Cash',
     });
 
+
     setModalOpen(true);
   };
+
 
 
   /* =======================================================
      OPEN EDIT MODAL
   ======================================================= */
 
+
   const openEdit = (txn) => {
     if (txn.community) return;
 
+
     setEditing(txn);
+
 
     reset({
       type: txn.type,
@@ -202,18 +259,23 @@ const Transactions = () => {
       paymentMode: txn.paymentMode,
     });
 
+
     setModalOpen(true);
   };
+
 
 
   /* =======================================================
      SUBMIT TRANSACTION
   ======================================================= */
 
+
   const onSubmit = async (formData) => {
     if (submitting) return;
 
+
     setSubmitting(true);
+
 
     try {
       if (editing) {
@@ -222,6 +284,7 @@ const Transactions = () => {
           formData
         );
 
+
         toast.success('Transaction updated');
       } else {
         await api.post(
@@ -229,10 +292,13 @@ const Transactions = () => {
           formData
         );
 
+
         toast.success('Transaction created');
       }
 
+
       setModalOpen(false);
+
 
       fetchTransactions();
     } catch (err) {
@@ -246,48 +312,57 @@ const Transactions = () => {
   };
 
 
+
   /* =======================================================
      DELETE TRANSACTION
   ======================================================= */
 
+
   const onDelete = async (txn) => {
     if (txn.community) return;
 
-    if (!window.confirm('Delete this transaction?')) {
-      return;
-    }
 
-    try {
-      await api.delete(`/transactions/${txn._id}`);
-
-      toast.success('Transaction deleted');
-
-      fetchTransactions();
-    } catch (err) {
-      toast.error('Failed to delete transaction');
-    }
+    confirm(
+      'Delete this transaction?',
+      async () => {
+        try {
+          await api.delete(`/transactions/${txn._id}`);
+          toast.success('Transaction deleted');
+          fetchTransactions();
+        } catch (err) {
+          toast.error('Failed to delete transaction');
+        }
+      },
+      'Delete Transaction'
+    );
   };
+
 
 
   /* =======================================================
      RENDER
   ======================================================= */
 
+
   return (
     <div>
+
 
       {/* ===================================================
           PAGE HEADER
       =================================================== */}
 
+
       <div className="page-title-row">
         <div>
           <h1>Transactions</h1>
+
 
           <p className="page-subtitle">
             Track every income, expense, and investment
           </p>
         </div>
+
 
         <motion.button
           className="btn btn-primary"
@@ -296,22 +371,27 @@ const Transactions = () => {
         >
           <FaPlus />
 
+
           Add Transaction
         </motion.button>
       </div>
+
 
 
       {/* ===================================================
           FILTER BAR
       =================================================== */}
 
+
       <div className="glass-card filter-bar">
+
 
         <div
           className="navbar-search"
           style={{ maxWidth: 320 }}
         >
           <FaSearch />
+
 
           <input
             placeholder="Search description..."
@@ -322,6 +402,7 @@ const Transactions = () => {
             }}
           />
         </div>
+
 
 
         <select
@@ -337,6 +418,7 @@ const Transactions = () => {
             All Types
           </option>
 
+
           {TYPES.map((t) => (
             <option
               key={t}
@@ -346,6 +428,7 @@ const Transactions = () => {
             </option>
           ))}
         </select>
+
 
 
         <select
@@ -361,21 +444,26 @@ const Transactions = () => {
             Personal + Community
           </option>
 
+
           <option value="personal">
             Personal only
           </option>
+
 
           <option value="community">
             Community only
           </option>
         </select>
 
+
       </div>
+
 
 
       {/* ===================================================
           TRANSACTION TABLE
       =================================================== */}
+
 
       <motion.div
         className="glass-card"
@@ -387,9 +475,12 @@ const Transactions = () => {
         }}
       >
 
+
         <div className="table-wrap">
 
+
           <table>
+
 
             <thead>
               <tr>
@@ -405,9 +496,12 @@ const Transactions = () => {
             </thead>
 
 
+
             <tbody>
 
+
               {/* LOADING */}
+
 
               {loading ? (
                 <tr>
@@ -422,7 +516,9 @@ const Transactions = () => {
                 </tr>
               ) : transactions.length === 0 ? (
 
+
                 /* NO DATA */
+
 
                 <tr>
                   <td
@@ -436,17 +532,23 @@ const Transactions = () => {
                   </td>
                 </tr>
 
+
               ) : (
+
 
                 /* TRANSACTIONS */
 
+
                 transactions.map((t) => (
 
+
                   <tr key={t._id}>
+
 
                     <td data-label="Txn #">
                       {t.transactionNumber}
                     </td>
+
 
 
                     <td data-label="Description">
@@ -454,9 +556,12 @@ const Transactions = () => {
                     </td>
 
 
+
                     <td data-label="Source">
 
+
                       {t.community ? (
+
 
                         <span
                           className="badge badge-warning"
@@ -465,29 +570,38 @@ const Transactions = () => {
                           <FaUsers
                             style={{
                               marginRight: 4,
-                            }}
-                          />
+                          }}
+                        />
+
 
                           {t.community.name}
                         </span>
 
+
                       ) : (
 
+
                         <span className="badge badge-info">
+
 
                           <FaLock
                             style={{
                               marginRight: 4,
-                            }}
-                          />
+                          }}
+                        />
+
 
                           Personal
 
+
                         </span>
+
 
                       )}
 
+
                     </td>
+
 
 
                     <td data-label="Category">
@@ -495,7 +609,9 @@ const Transactions = () => {
                     </td>
 
 
+
                     <td data-label="Type">
+
 
                       <span
                         className={`badge ${t.type === 'income'
@@ -504,16 +620,21 @@ const Transactions = () => {
                           }`}
                       >
 
+
                         {t.type === 'income'
                           ? <FaArrowUp />
                           : <FaArrowDown />
                         }
 
+
                         {t.type}
+
 
                       </span>
 
+
                     </td>
+
 
 
                     <td data-label="Amount">
@@ -526,6 +647,7 @@ const Transactions = () => {
                     </td>
 
 
+
                     <td data-label="Date">
                       {dayjs(t.date).format(
                         'DD MMM YYYY, hh:mm A'
@@ -533,9 +655,12 @@ const Transactions = () => {
                     </td>
 
 
+
                     <td data-label="Actions">
 
+
                       {t.community ? (
+
 
                         <Link
                           to="/community"
@@ -543,12 +668,14 @@ const Transactions = () => {
                           style={{
                             padding: '6px 12px',
                             fontSize: '0.75rem',
-                          }}
+                        }}
                         >
                           View in Community
                         </Link>
 
+
                       ) : (
+
 
                         <>
                           <button
@@ -560,6 +687,7 @@ const Transactions = () => {
                             <FaEdit />
                           </button>
 
+
                           <button
                             className="icon-btn"
                             onClick={() =>
@@ -570,34 +698,47 @@ const Transactions = () => {
                           </button>
                         </>
 
+
                       )}
+
 
                     </td>
 
+
                   </tr>
+
 
                 ))
 
+
               )}
+
 
             </tbody>
 
+
           </table>
 
+
         </div>
+
 
 
         {/* =================================================
             PAGINATION
         ================================================= */}
 
+
         {pages > 1 && (
 
+
           <div className="pagination">
+
 
             {Array.from(
               { length: pages },
               (_, i) => (
+
 
                 <button
                   key={i}
@@ -612,19 +753,25 @@ const Transactions = () => {
                   {i + 1}
                 </button>
 
+
               )
             )}
 
+
           </div>
+
 
         )}
 
+
       </motion.div>
+
 
 
       {/* ===================================================
           TRANSACTION MODAL
       =================================================== */}
+
 
       <Modal
         isOpen={modalOpen}
@@ -634,6 +781,7 @@ const Transactions = () => {
             ? 'Edit Transaction'
             : 'Add Transaction'
         }
+
 
         footer={
           <>
@@ -645,6 +793,7 @@ const Transactions = () => {
             >
               Cancel
             </button>
+
 
             <button
               className="btn btn-primary"
@@ -662,19 +811,24 @@ const Transactions = () => {
         }
       >
 
+
         <form
           onSubmit={handleSubmit(onSubmit)}
         >
+
 
           {/* =================================================
               TYPE
           ================================================= */}
 
+
           <div className="form-group">
+
 
             <label className="form-label">
               Type
             </label>
+
 
             <select
               className="form-input"
@@ -683,7 +837,9 @@ const Transactions = () => {
               })}
             >
 
+
               {TYPES.map((t) => (
+
 
                 <option
                   key={t}
@@ -692,9 +848,12 @@ const Transactions = () => {
                   {t}
                 </option>
 
+
               ))}
 
+
             </select>
+
 
             {errors.type && (
               <span className="form-error">
@@ -702,25 +861,32 @@ const Transactions = () => {
               </span>
             )}
 
+
           </div>
+
 
 
           {/* =================================================
               CATEGORY
           ================================================= */}
 
+
           <div className="form-group">
+
 
             <label className="form-label">
               Category
             </label>
+
 
             <select
               className="form-input"
               {...register('category')}
             >
 
+
               {CATEGORIES.map((c) => (
+
 
                 <option
                   key={c}
@@ -729,22 +895,29 @@ const Transactions = () => {
                   {c}
                 </option>
 
+
               ))}
+
 
             </select>
 
+
           </div>
+
 
 
           {/* =================================================
               AMOUNT
           ================================================= */}
 
+
           <div className="form-group">
+
 
             <label className="form-label">
               Amount
             </label>
+
 
             <input
               className="form-input"
@@ -753,10 +926,12 @@ const Transactions = () => {
               {...register('amount', {
                 required: 'Amount is required',
 
+
                 min: {
                   value: 0.01,
                   message: 'Must be greater than 0',
                 },
+
 
                 maxLength: {
                   value: 8,
@@ -765,24 +940,30 @@ const Transactions = () => {
               })}
             />
 
+
             {errors.amount && (
               <span className="form-error">
                 {errors.amount.message}
               </span>
             )}
 
+
           </div>
+
 
 
           {/* =================================================
               DATE
           ================================================= */}
 
+
           <div className="form-group">
+
 
             <label className="form-label">
               Date
             </label>
+
 
             <input
               className="form-input"
@@ -792,31 +973,39 @@ const Transactions = () => {
               })}
             />
 
+
             {errors.date && (
               <span className="form-error">
                 {errors.date.message}
               </span>
             )}
 
+
           </div>
+
 
 
           {/* =================================================
               PAYMENT MODE
           ================================================= */}
 
+
           <div className="form-group">
+
 
             <label className="form-label">
               Payment Mode
             </label>
+
 
             <select
               className="form-input"
               {...register('paymentMode')}
             >
 
+
               {PAYMENT_MODES.map((p) => (
+
 
                 <option
                   key={p}
@@ -825,22 +1014,29 @@ const Transactions = () => {
                   {p}
                 </option>
 
+
               ))}
+
 
             </select>
 
+
           </div>
+
 
 
           {/* =================================================
               DESCRIPTION
           ================================================= */}
 
+
           <div className="form-group">
+
 
             <label className="form-label">
               Description
             </label>
+
 
             <textarea
               className="form-input"
@@ -848,10 +1044,6 @@ const Transactions = () => {
               placeholder="Enter transaction description..."
               {...register('description', {
 
-                /* -----------------------------------------
-                   REQUIRED ONLY IF YOU WANT DESCRIPTION
-                   REQUIRED. Currently optional.
-                ----------------------------------------- */
 
                 maxLength: {
                   value: 50,
@@ -859,9 +1051,9 @@ const Transactions = () => {
                     'Maximum 50 characters',
                 },
 
-                
 
                 validate: (value) => {
+
 
                   const text = value?.trim() || '';
 
@@ -870,19 +1062,24 @@ const Transactions = () => {
                     return true;
                   }
 
+
                   const hasLongWord =
                     /\S{20,}/.test(text);
+
 
                   if (hasLongWord) {
                     return 'Please add spaces between words.';
                   }
+
 
                   return true;
                 },
               })}
             />
 
+
             {/* DESCRIPTION ERROR */}
+
 
             {errors.description && (
               <span className="form-error">
@@ -890,15 +1087,50 @@ const Transactions = () => {
               </span>
             )}
 
+
           </div>
+
 
         </form>
 
+
       </Modal>
+
+      {/* ===================================================
+          CUSTOM CONFIRMATION MODAL
+      =================================================== */}
+
+      <Modal
+        isOpen={confirmConfig.isOpen}
+        onClose={() => setConfirmConfig((prev) => ({ ...prev, isOpen: false }))}
+        title={confirmConfig.title}
+        footer={
+          <>
+            <button
+              className="btn btn-outline"
+              onClick={() => setConfirmConfig((prev) => ({ ...prev, isOpen: false }))}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn btn-danger"
+              onClick={confirmConfig.onConfirm}
+            >
+              Confirm
+            </button>
+          </>
+        }
+      >
+        <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-main, #333)', lineHeight: 1.5 }}>
+          {confirmConfig.message}
+        </p>
+      </Modal>
+
 
     </div>
   );
 };
+
 
 
 export default Transactions;
