@@ -1,7 +1,3 @@
-/* =========================================================
-   TRANSACTIONS PAGE
-========================================================= */
-
 
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
@@ -26,12 +22,6 @@ import {
 import api from '../services/api';
 import Modal from '../components/Modal';
 import './listPage.css';
-
-
-
-/* =========================================================
-   CONSTANTS
-========================================================= */
 
 
 const CATEGORIES = [
@@ -69,13 +59,6 @@ const PAYMENT_MODES = [
   'Other',
 ];
 
-
-
-/* =========================================================
-   COMPONENT
-========================================================= */
-
-
 const Transactions = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -87,7 +70,7 @@ const Transactions = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  // Custom Confirmation Modal State
+ 
   const [confirmConfig, setConfirmConfig] = useState({
     isOpen: false,
     title: 'Confirm Action',
@@ -124,12 +107,6 @@ const Transactions = () => {
   const [submitting, setSubmitting] = useState(false);
 
 
-
-  /* =======================================================
-     REACT HOOK FORM
-  ======================================================= */
-
-
   const {
     register,
     handleSubmit,
@@ -139,11 +116,6 @@ const Transactions = () => {
     mode: 'onChange',
   });
 
-
-
-  /* =======================================================
-     FETCH TRANSACTIONS
-  ======================================================= */
 
 
   const fetchTransactions = useCallback(async () => {
@@ -184,21 +156,9 @@ const Transactions = () => {
   }, [search, typeFilter, sourceFilter, page]);
 
 
-
-  /* =======================================================
-     LOAD TRANSACTIONS
-  ======================================================= */
-
-
   useEffect(() => {
     fetchTransactions();
   }, [fetchTransactions]);
-
-
-
-  /* =======================================================
-     SYNC SEARCH WITH URL
-  ======================================================= */
 
 
   useEffect(() => {
@@ -209,14 +169,8 @@ const Transactions = () => {
     }
 
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [search]);
-
-
-
-  /* =======================================================
-     OPEN CREATE MODAL
-  ======================================================= */
 
 
   const openCreate = () => {
@@ -235,12 +189,6 @@ const Transactions = () => {
 
     setModalOpen(true);
   };
-
-
-
-  /* =======================================================
-     OPEN EDIT MODAL
-  ======================================================= */
 
 
   const openEdit = (txn) => {
@@ -262,12 +210,6 @@ const Transactions = () => {
 
     setModalOpen(true);
   };
-
-
-
-  /* =======================================================
-     SUBMIT TRANSACTION
-  ======================================================= */
 
 
   const onSubmit = async (formData) => {
@@ -312,12 +254,6 @@ const Transactions = () => {
   };
 
 
-
-  /* =======================================================
-     DELETE TRANSACTION
-  ======================================================= */
-
-
   const onDelete = async (txn) => {
     if (txn.community) return;
 
@@ -338,20 +274,8 @@ const Transactions = () => {
   };
 
 
-
-  /* =======================================================
-     RENDER
-  ======================================================= */
-
-
   return (
     <div>
-
-
-      {/* ===================================================
-          PAGE HEADER
-      =================================================== */}
-
 
       <div className="page-title-row">
         <div>
@@ -375,13 +299,6 @@ const Transactions = () => {
           Add Transaction
         </motion.button>
       </div>
-
-
-
-      {/* ===================================================
-          FILTER BAR
-      =================================================== */}
-
 
       <div className="glass-card filter-bar">
 
@@ -459,12 +376,6 @@ const Transactions = () => {
       </div>
 
 
-
-      {/* ===================================================
-          TRANSACTION TABLE
-      =================================================== */}
-
-
       <motion.div
         className="glass-card"
         initial={{ opacity: 0 }}
@@ -499,10 +410,6 @@ const Transactions = () => {
 
             <tbody>
 
-
-              {/* LOADING */}
-
-
               {loading ? (
                 <tr>
                   <td
@@ -517,8 +424,7 @@ const Transactions = () => {
               ) : transactions.length === 0 ? (
 
 
-                /* NO DATA */
-
+                
 
                 <tr>
                   <td
@@ -723,12 +629,6 @@ const Transactions = () => {
         </div>
 
 
-
-        {/* =================================================
-            PAGINATION
-        ================================================= */}
-
-
         {pages > 1 && (
 
 
@@ -765,12 +665,6 @@ const Transactions = () => {
 
 
       </motion.div>
-
-
-
-      {/* ===================================================
-          TRANSACTION MODAL
-      =================================================== */}
 
 
       <Modal
@@ -816,12 +710,6 @@ const Transactions = () => {
           onSubmit={handleSubmit(onSubmit)}
         >
 
-
-          {/* =================================================
-              TYPE
-          ================================================= */}
-
-
           <div className="form-group">
 
 
@@ -866,11 +754,6 @@ const Transactions = () => {
 
 
 
-          {/* =================================================
-              CATEGORY
-          ================================================= */}
-
-
           <div className="form-group">
 
 
@@ -903,12 +786,6 @@ const Transactions = () => {
 
 
           </div>
-
-
-
-          {/* =================================================
-              AMOUNT
-          ================================================= */}
 
 
           <div className="form-group">
@@ -952,11 +829,6 @@ const Transactions = () => {
 
 
 
-          {/* =================================================
-              DATE
-          ================================================= */}
-
-
           <div className="form-group">
 
 
@@ -982,13 +854,6 @@ const Transactions = () => {
 
 
           </div>
-
-
-
-          {/* =================================================
-              PAYMENT MODE
-          ================================================= */}
-
 
           <div className="form-group">
 
@@ -1022,12 +887,6 @@ const Transactions = () => {
 
 
           </div>
-
-
-
-          {/* =================================================
-              DESCRIPTION
-          ================================================= */}
 
 
           <div className="form-group">
@@ -1095,10 +954,6 @@ const Transactions = () => {
 
 
       </Modal>
-
-      {/* ===================================================
-          CUSTOM CONFIRMATION MODAL
-      =================================================== */}
 
       <Modal
         isOpen={confirmConfig.isOpen}
