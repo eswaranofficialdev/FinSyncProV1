@@ -129,7 +129,8 @@ td[data-label="Involved Members"] {
 }
 
 td[data-label="Involved Members"] {
-  max-width: 250px;
+  max-width: 100%;
   white-space: normal;
   line-height: 1.4;
 }
+

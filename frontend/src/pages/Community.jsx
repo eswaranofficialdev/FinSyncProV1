@@ -185,7 +185,19 @@ const Community = () => {
   };
 
   const toggleSelectedMember = (id) => {
-    setSelectedMemberIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setSelectedMemberIds((prev) => {
+      // If the ID is already selected, allow them to deselect it
+      if (prev.includes(id)) {
+        return prev.filter((x) => x !== id);
+      }
+      // If they already have 10 selected, block adding another and notify
+      if (prev.length >= 10) {
+        toast.warning('You can select a maximum of 10 members only.');
+        return prev;
+      }
+      // Otherwise, add the new member
+      return [...prev, id];
+    });
   };
 
   const handleSearchChange = (val) => {
