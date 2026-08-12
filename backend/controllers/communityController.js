@@ -391,28 +391,51 @@ exports.getSettlementRequests = asyncHandler(async (req, res) => {
   const membership = await getMembership(community._id, req.user._id);
   if (!membership && !isSuperadmin(req)) return ApiResponse.error(res, 403, 'You are not a member of this community');
 
+  const isOwner = String(community.admin) === String(req.user._id);
+  const isSuper = isSuperadmin(req);
+
   const { month } = req.query;
   const query = { community: community._id };
+
+  // 🌟 ROLE-BASED VISIBILITY RESTRICTION 🌟
+  // If not Owner and not Superadmin, restrict to their own send/receive requests
+  if (!isOwner && !isSuper) {
+    query.$or = [
+      { fromUser: req.user._id },
+      { toUser: req.user._id }
+    ];
+  }
 
   if (month) {
     const [year, monthNum] = month.split('-');
     const startDate = new Date(year, monthNum - 1, 1);
     const endDate = new Date(year, monthNum, 1);
 
-    query.$or = [
-      { status: 'pending' },
-      { 
-        status: { $in: ['approved', 'rejected', 'completed'] },
-        updatedAt: { $gte: startDate, $lt: endDate }
-      }
-    ];
+    const monthFilter = {
+      status: { $in: ['approved', 'rejected', 'completed'] },
+      updatedAt: { $gte: startDate, $lt: endDate }
+    };
+
+    if (!isOwner && !isSuper) {
+      // Combine month filter with user restriction using $and
+      query.$and = [
+        { $or: [{ fromUser: req.user._id }, { toUser: req.user._id }] },
+        { $or: [{ status: 'pending' }, monthFilter] }
+      ];
+      delete query.$or; // clean up base $or
+    } else {
+      query.$or = [
+        { status: 'pending' },
+        monthFilter
+      ];
+    }
   }
 
   const requests = await SettlementRequest.find(query)
     .populate('fromUser', 'name email avatar')
     .populate({ 
       path: 'toUser', 
-      select: 'name email avatar', // FIX: Populating the exact fields for toUser
+      select: 'name email avatar',
       model: 'User' 
     })
     .populate('respondedBy', 'name')

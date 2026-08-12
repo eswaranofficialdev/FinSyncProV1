@@ -753,48 +753,39 @@ const Community = () => {
             </div>
 
             <div className="glass-card" style={{ padding: 20 }}>
-              <h3 style={{ marginBottom: 16 }}>Settlements & Payments ({dayjs(selectedMonth).format('MMMM YYYY')})</h3>
+  <h3 style={{ marginBottom: 16 }}>Settlements & Payments ({dayjs(selectedMonth).format('MMMM YYYY')})</h3>
 
-              {requestsLoading ? (
-                <p style={{ textAlign: 'center', margin: 20 }}>Loading payment history...</p>
-              ) : currentMonthPayments.length === 0 ? (
-                <p style={{ textAlign: 'center', color: 'var(--text-secondary)', margin: 20 }}>No payments recorded for this month.</p>
-              ) : (
-                detail.members.map((m) => {
-                  // Filter specifically for this month's payments per user
-                  const userPayments = currentMonthPayments.filter(p => p.fromUser?._id === m.user?._id || p.toUser?._id === m.user?._id);
-                  if (userPayments.length === 0) return null;
-
-                  return (
-                    <div key={`payments-${m._id}`} style={{ marginBottom: 20 }}>
-                      <h4 style={{ marginBottom: 10, color: 'var(--color-primary)' }}>{m.user?.name}'s Payments</h4>
-                      <div className="table-wrap">
-                        <table>
-                          <thead>
-                            <tr>
-                              <th>Date</th>
-                              <th>Paid By</th>
-                              <th>Paid To</th>
-                              <th>Amount</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {userPayments.map(p => (
-                              <tr key={p._id}>
-                                <td data-label="Date">{dayjs(p.updatedAt || p.createdAt).format('DD MMM, hh:mm A')}</td>
-                                <td data-label="Paid By">{p.fromUser?.name}</td>
-                                <td data-label="Paid To">{p.toUser?.name}</td>
-                                <td data-label="Amount" style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>₹{p.amount.toFixed(2)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
+  {requestsLoading ? (
+    <p style={{ textAlign: 'center', margin: 20 }}>Loading payment history...</p>
+  ) : currentMonthPayments.length === 0 ? (
+    <p style={{ textAlign: 'center', color: 'var(--text-secondary)', margin: 20 }}>No payments recorded for this month.</p>
+  ) : (
+    <div className="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Paid By</th>
+            <th>Paid To</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentMonthPayments.map(p => (
+            <tr key={p._id}>
+              <td data-label="Date">{dayjs(p.updatedAt || p.createdAt).format('DD MMM, hh:mm A')}</td>
+              <td data-label="Paid By"><strong>{p.fromUser?.name || 'Unknown'}</strong></td>
+              <td data-label="Paid To"><strong>{p.toUser?.name || 'Community Creditor'}</strong></td>
+              <td data-label="Amount" style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
+                ₹{p.amount.toFixed(2)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
           </motion.div>
         )}
 
