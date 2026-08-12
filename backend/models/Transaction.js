@@ -59,7 +59,7 @@ transactionSchema.index({ community: 1 });
 transactionSchema.pre('save', async function (next) {
   if (!this.isNew) return next();
   const count = await mongoose.model('Transaction').countDocuments();
-  this.transactionNumber = `TXN-${String(count + 1).padStart(6, '0')}`;
+  this.transactionNumber = `TXN-${Math.floor(100000 + Math.random() * 900000)}`;
   next();
 });
 
