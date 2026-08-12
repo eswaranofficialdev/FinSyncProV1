@@ -825,31 +825,25 @@ const Community = () => {
                   maxLength: { value: 20, message: 'Maximum 20 characters allowed' }
                 })}
               />
-              {/* 🌟 VALIDATION ADDED FOR EDIT NAME */}
               {editForm.formState.errors.name && (
                 <span className="form-error">{editForm.formState.errors.name.message}</span>
               )}
             </div>
+
             <div className="form-group">
               <label className="form-label">Description</label>
-              <input
+              {/* 🌟 Ensure this is a <textarea> and uses editForm.register('description') */}
+              <textarea
                 className="form-input"
-                {...splitForm.register('description', {
-                  maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                  // 🌟 ADD THIS VALIDATION BLOCK HERE 🌟
-                  validate: (value) => {
-                    const text = value?.trim() || '';
-                    if (!text) return true;
-                    const hasLongWord = /\S{20,}/.test(text);
-                    if (hasLongWord) {
-                      return 'Please add spaces between words.';
-                    }
-                    return true;
-                  }
+                rows="3"
+                {...editForm.register('description', {
+                  required: 'Description is required',
+                  minLength: { value: 3, message: 'Minimum 3 characters required' },
+                  maxLength: { value: 50, message: 'Maximum 50 characters allowed' }
                 })}
               />
-              {splitForm.formState.errors.description && (
-                <span className="form-error">{splitForm.formState.errors.description.message}</span>
+              {editForm.formState.errors.description && (
+                <span className="form-error">{editForm.formState.errors.description.message}</span>
               )}
             </div>
           </form>
