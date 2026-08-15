@@ -68,7 +68,7 @@ exports.getCommunityById = asyncHandler(async (req, res) => {
   );
 
   const totalExpenses = await Transaction.aggregate([
-    { $match: { community: community._id, type: 'expense' } },
+    { $match: { community: community._id, type: 'Expense' } },
     { $group: { _id: null, sum: { $sum: '$amount' } } },
   ]);
 
@@ -193,7 +193,7 @@ exports.deleteCommunity = asyncHandler(async (req, res) => {
   ApiResponse.success(res, 200, 'Community deleted');
 });
 
-// 🌟 PERFECT GROSS MATH FOR SPLITTING EXPENSES
+// 🌟 PERFECT GROSS MATH FOR SPLITTING ExpenseS
 exports.addSplitExpense = asyncHandler(async (req, res) => {
   const { amount, description, category = 'Others', splitAmong } = req.body;
   const community = await Community.findById(req.params.id);
@@ -201,11 +201,11 @@ exports.addSplitExpense = asyncHandler(async (req, res) => {
 
   const requesterMembership = await getMembership(community._id, req.user._id);
   if (!requesterMembership || !['owner', 'admin'].includes(requesterMembership.role)) {
-    return ApiResponse.error(res, 403, 'Only the community owner or a Community Admin can add expenses');
+    return ApiResponse.error(res, 403, 'Only the community owner or a Community Admin can add Expenses');
   }
 
   if (!splitAmong || !splitAmong.length) {
-    return ApiResponse.error(res, 400, 'Select at least one member to split this expense among');
+    return ApiResponse.error(res, 400, 'Select at least one member to split this Expense among');
   }
 
   let members = await CommunityMember.find({ community: community._id });
@@ -219,7 +219,7 @@ exports.addSplitExpense = asyncHandler(async (req, res) => {
   const txn = await Transaction.create({
     owner: req.user._id,
     community: community._id,
-    type: 'expense',
+    type: 'Expense',
     category,
     amount: totalAmount,
     description,
@@ -252,7 +252,7 @@ exports.addSplitExpense = asyncHandler(async (req, res) => {
     $inc: { totalExpenses: totalAmount }
   });
 
-  ApiResponse.success(res, 201, 'Split expense recorded', { transaction: txn, shareAmount });
+  ApiResponse.success(res, 201, 'Split Expense recorded', { transaction: txn, shareAmount });
 });
 
 // 🌟 5-MINUTE LOCK & GROSS MATH ROLLBACK IMPLEMENTED
@@ -328,12 +328,12 @@ exports.createSettlementRequest = asyncHandler(async (req, res) => {
   const membership = await getMembership(community._id, req.user._id);
   if (!membership) return ApiResponse.error(res, 403, 'You are not a member of this community');
 
-  const latestTxn = await Transaction.findOne({ community: community._id, type: 'expense' }).sort('-createdAt');
+  const latestTxn = await Transaction.findOne({ community: community._id, type: 'Expense' }).sort('-createdAt');
   if (latestTxn) {
     const diffMins = (Date.now() - new Date(latestTxn.createdAt).getTime()) / (1000 * 60);
     if (diffMins < 5) {
       const waitTime = Math.ceil(5 - diffMins);
-      return ApiResponse.error(res, 400, `Please wait ${waitTime} more minute(s) after the latest expense was added before settling dues to ensure balances are finalized.`);
+      return ApiResponse.error(res, 400, `Please wait ${waitTime} more minute(s) after the latest Expense was added before settling dues to ensure balances are finalized.`);
     }
   }
 
@@ -485,7 +485,7 @@ exports.respondToSettlementRequest = asyncHandler(async (req, res) => {
     await Transaction.create({
       owner: request.fromUser,
       community: null,
-      type: 'expense',
+      type: 'Expense',
       category: 'Community Payment',
       amount: payAmount,
       description: `Settled community dues to ${payeeMembership.user?.name || 'Member'} in: ${community.name}`,

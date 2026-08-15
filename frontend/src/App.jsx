@@ -29,6 +29,7 @@ import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Community from './pages/Community';
 import Reports from './pages/Reports';
+import Budgets from './pages/Budgets';
 import Users from './pages/Users';
 import Notifications from './pages/Notifications';
 import Settings from './pages/Settings';
@@ -102,6 +103,10 @@ function App() {
                 <Route
                   path="/reports"
                   element={<Reports />}
+                />
+                <Route
+                  path="/budgets"
+                  element={<Budgets />}
                 />
 
                 <Route

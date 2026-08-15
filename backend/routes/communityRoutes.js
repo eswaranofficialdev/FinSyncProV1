@@ -20,7 +20,7 @@ router.get('/:id/transactions', getCommunityTransactions);
 router.post('/:id/members', addMember);
 router.delete('/:id/members/:userId', removeMember);
 router.patch('/:id/members/:userId/role', updateMemberRole);
-router.post('/:id/split-expense', addSplitExpense);
+router.post('/:id/split-Expense', addSplitExpense);
 router.post('/:id/settle', settleBalance);
 router.post('/:id/settlement-requests', createSettlementRequest);
 router.get('/:id/settlement-requests', getSettlementRequests);

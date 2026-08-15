@@ -159,8 +159,8 @@ const Reports = () => {
       communityDetail?.members?.forEach((m) => {
         const spend = communityTxns.filter(t => (t.owner?._id || t.owner) === m.user?._id).reduce((sum, t) => sum + t.amount, 0);
         const owes = communityTxns.filter(t => t.splitAmong?.some(u => (u._id || u) === m.user?._id)).reduce((sum, t) => sum + (t.amount / (t.splitAmong?.length || 1)), 0);
-        const expense = owes - spend;
-        rows.push([m.user?.name, spend.toFixed(2), owes.toFixed(2), expense.toFixed(2)]);
+        const Expense = owes - spend;
+        rows.push([m.user?.name, spend.toFixed(2), owes.toFixed(2), Expense.toFixed(2)]);
       });
       filename = `finsync-${selectedCommunity?.name || 'community'}-monthly-report.csv`;
     }
@@ -296,13 +296,13 @@ const Reports = () => {
                   ) : (
                     report.map((r, i) => {
                       const income = r?.totalIncome || 0;
-                      const expense = r?.totalExpense || 0;
-                      const net = income - expense;
+                      const Expense = r?.totalExpense || 0;
+                      const net = income - Expense;
                       return (
                         <tr key={i}>
                           <td data-label="Period">{labelFor(r)}</td>
                           <td data-label="Income">₹{income.toLocaleString()}</td>
-                          <td data-label="Expense">₹{expense.toLocaleString()}</td>
+                          <td data-label="Expense">₹{Expense.toLocaleString()}</td>
                           <td data-label="Net Flow">₹{net.toLocaleString()}</td>
                           <td data-label="Entries">{r?.count || 0}</td>
                         </tr>
@@ -343,15 +343,15 @@ const Reports = () => {
                       .filter(t => t.splitAmong?.some(u => (u._id || u) === m.user?._id))
                       .reduce((sum, t) => sum + (t.amount / (t.splitAmong?.length || 1)), 0);
 
-                    const expense = owes - spend;
+                    const Expense = owes - spend;
 
                     return (
                       <tr key={m._id}>
                         <td data-label="Name">{m.user?.name}</td>
                         <td data-label="Total Spend">₹{spend.toFixed(2)}</td>
                         <td data-label="Total Owes">₹{owes.toFixed(2)}</td>
-                        <td data-label="Total Expense" style={{ color: expense > 0 ? 'var(--color-danger)' : expense < 0 ? 'var(--color-success)' : 'inherit', fontWeight: 'bold' }}>
-                          {expense > 0 ? `Owes ₹${expense.toFixed(2)}` : expense < 0 ? `Collects ₹${Math.abs(expense).toFixed(2)}` : '₹0.00'}
+                        <td data-label="Total Expense" style={{ color: Expense > 0 ? 'var(--color-danger)' : Expense < 0 ? 'var(--color-success)' : 'inherit', fontWeight: 'bold' }}>
+                          {Expense > 0 ? `Owes ₹${Expense.toFixed(2)}` : Expense < 0 ? `Collects ₹${Math.abs(Expense).toFixed(2)}` : '₹0.00'}
                         </td>
                       </tr>
                     );

@@ -49,7 +49,7 @@ exports.getUserById = asyncHandler(async (req, res) => {
 
   const communityCount = await CommunityMember.countDocuments({ user: target._id });
 
-  // Personal financial stats (income/expense totals) are only visible to the account owner.
+  // Personal financial stats (income/Expense totals) are only visible to the account owner.
   const payload = { ...target.toSafeObject(), stats: { communityCount } };
   if (isSelf) {
     const Transaction = require('../models/Transaction');
@@ -59,7 +59,7 @@ exports.getUserById = asyncHandler(async (req, res) => {
         { $group: { _id: null, sum: { $sum: '$amount' } } },
       ]),
       Transaction.aggregate([
-        { $match: { owner: target._id, type: 'expense' } },
+        { $match: { owner: target._id, type: 'Expense' } },
         { $group: { _id: null, sum: { $sum: '$amount' } } },
       ]),
     ]);

@@ -51,11 +51,11 @@ const buildTrendData = (trend = []) => {
             map[key] = {
               label: `${getMonthName(month)} ${year}`,
               income: 0,
-              expense: 0,
+              Expense: 0,
             };
           }
           if (type === 'income') map[key].income = t.total || 0;
-          if (type === 'expense') map[key].expense = t.total || 0;
+          if (type === 'Expense') map[key].Expense = t.total || 0;
         }
       }
     });
@@ -88,7 +88,7 @@ const buildTrendData = (trend = []) => {
       },
       {
         label: 'Expense',
-        data: entries.map((e) => e.expense),
+        data: entries.map((e) => e.Expense),
         borderColor: '#F43F5E',
         backgroundColor: (context) => {
           const ctx = context.chart.ctx;
@@ -334,9 +334,9 @@ export const ChartCard = ({
 
     if (type === 'line' && chartData.datasets) {
       const incomeData = chartData.datasets[0]?.data || [];
-      const expenseData = chartData.datasets[1]?.data || [];
+      const ExpenseData = chartData.datasets[1]?.data || [];
       const totalIncome = incomeData.reduce((a, b) => a + b, 0);
-      const totalExpense = expenseData.reduce((a, b) => a + b, 0);
+      const totalExpense = ExpenseData.reduce((a, b) => a + b, 0);
 
       return (
         <div className="chart-stats">
@@ -346,7 +346,7 @@ export const ChartCard = ({
             <span className="stat-value positive">₹{totalIncome.toLocaleString()}</span>
           </div>
           <div className="stat-item">
-            <span className="stat-dot expense"></span>
+            <span className="stat-dot Expense"></span>
             <span className="stat-label">Total Expense</span>
             <span className="stat-value negative">₹{totalExpense.toLocaleString()}</span>
           </div>

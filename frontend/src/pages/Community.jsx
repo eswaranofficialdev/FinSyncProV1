@@ -49,7 +49,7 @@ const Community = () => {
 
   // Filter States
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM'));
-  const [activeTab, setActiveTab] = useState('expenses');
+  const [activeTab, setActiveTab] = useState('Expenses');
   const [showReport, setShowReport] = useState(false);
 
   // Custom Confirmation Modal State
@@ -171,23 +171,23 @@ const Community = () => {
   const onSplitExpense = async (formData) => {
     if (submitting) return;
     if (selectedMemberIds.length === 0) {
-      toast.error('Select at least one member to split this expense among');
+      toast.error('Select at least one member to split this Expense among');
       return;
     }
     setSubmitting(true);
     try {
-      await api.post(`/communities/${detail.community._id}/split-expense`, {
+      await api.post(`/communities/${detail.community._id}/split-Expense`, {
         amount: Number(formData.amount),
         description: formData.description,
         category: formData.category || 'Others',
         splitAmong: selectedMemberIds,
       });
-      toast.success('Split expense recorded');
+      toast.success('Split Expense recorded');
       setSplitOpen(false);
       splitForm.reset();
       openDetail(detail.community._id);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to add split expense');
+      toast.error(err.response?.data?.message || 'Failed to add split Expense');
     } finally {
       setSubmitting(false);
     }
@@ -610,8 +610,8 @@ const Community = () => {
 
             <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
               <button
-                className={`btn ${activeTab === 'expenses' ? 'btn-primary' : 'btn-outline'}`}
-                onClick={() => setActiveTab('expenses')}
+                className={`btn ${activeTab === 'Expenses' ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => setActiveTab('Expenses')}
               >
                 <FaReceipt style={{ marginRight: 6 }} /> Community Expenses
               </button>
@@ -623,7 +623,7 @@ const Community = () => {
               </button>
             </div>
 
-            {activeTab === 'expenses' && (
+            {activeTab === 'Expenses' && (
               <div className="glass-card" style={{ padding: 20 }}>
                 <h3 style={{ marginBottom: 16 }}>Community Expenses ({dayjs(selectedMonth).format('MMMM YYYY')})</h3>
                 <div className="table-wrap">
@@ -641,9 +641,9 @@ const Community = () => {
                     </thead>
                     <tbody>
                       {txnLoading ? (
-                        <tr><td colSpan={canManageTransactions ? 7 : 6} style={{ textAlign: 'center' }}>Loading expenses...</td></tr>
+                        <tr><td colSpan={canManageTransactions ? 7 : 6} style={{ textAlign: 'center' }}>Loading Expenses...</td></tr>
                       ) : currentMonthTxns.length === 0 ? (
-                        <tr><td colSpan={canManageTransactions ? 7 : 6} style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No expenses recorded this month</td></tr>
+                        <tr><td colSpan={canManageTransactions ? 7 : 6} style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No Expenses recorded this month</td></tr>
                       ) : currentMonthTxns.map((t) => {
                         const involvedCount = t.splitAmong?.length || 1;
                         const splitPerPerson = (t.amount / involvedCount).toFixed(2);
@@ -772,15 +772,15 @@ const Community = () => {
                         .filter(t => t.splitAmong?.some(u => (u._id || u) === m.user?._id))
                         .reduce((sum, t) => sum + (t.amount / (t.splitAmong?.length || 1)), 0);
 
-                      const expense = owes - spend;
+                      const Expense = owes - spend;
 
                       return (
                         <tr key={m._id}>
                           <td data-label="Name">{m.user?.name}</td>
                           <td data-label="Total Spend">₹{spend.toFixed(2)}</td>
                           <td data-label="Total Owes">₹{owes.toFixed(2)}</td>
-                          <td data-label="Total Expense" style={{ color: expense > 0 ? 'var(--color-danger)' : expense < 0 ? 'var(--color-success)' : 'inherit', fontWeight: 'bold' }}>
-                            {expense > 0 ? `Owes ₹${expense.toFixed(2)}` : expense < 0 ? `Collects ₹${Math.abs(expense).toFixed(2)}` : '₹0.00'}
+                          <td data-label="Total Expense" style={{ color: Expense > 0 ? 'var(--color-danger)' : Expense < 0 ? 'var(--color-success)' : 'inherit', fontWeight: 'bold' }}>
+                            {Expense > 0 ? `Owes ₹${Expense.toFixed(2)}` : Expense < 0 ? `Collects ₹${Math.abs(Expense).toFixed(2)}` : '₹0.00'}
                           </td>
                         </tr>
                       );
@@ -1094,7 +1094,7 @@ const Community = () => {
       ) : communities.length === 0 ? (
         <div className="glass-card" style={{ padding: 40, textAlign: 'center' }}>
           <FaUserFriends size={40} style={{ marginBottom: 12, color: 'var(--color-primary)' }} />
-          <p>No communities yet. Create one to start splitting expenses!</p>
+          <p>No communities yet. Create one to start splitting Expenses!</p>
         </div>
       ) : (
         <div className="community-grid">

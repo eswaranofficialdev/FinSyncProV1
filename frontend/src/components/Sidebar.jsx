@@ -11,6 +11,7 @@ const menuItems = [
   { label: 'Dashboard', icon: <FaChartPie />, path: '/dashboard', roles: ['superadmin', 'admin', 'user'] },
   { label: 'Transactions', icon: <FaExchangeAlt />, path: '/transactions', roles: ['superadmin', 'admin', 'user'] },
   { label: 'Community', icon: <FaUserFriends />, path: '/community', roles: ['superadmin', 'admin', 'user'] },
+  { label: 'Budget', icon: <FaChartPie />, path: '/budgets', roles: ['superadmin', 'admin', 'user'] },
   { label: 'Reports', icon: <FaFileAlt />, path: '/reports', roles: ['superadmin', 'admin', 'user'] },
   { label: 'Users', icon: <FaUsers />, path: '/users', roles: ['superadmin'] },
   { label: 'Notifications', icon: <FaBell />, path: '/notifications', roles: ['superadmin', 'admin', 'user'] },

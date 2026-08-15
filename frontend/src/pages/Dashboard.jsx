@@ -50,7 +50,7 @@ const Dashboard = () => {
         <StatCard title="Community Expense" value={cards.communityExpense} icon={<FaUsers />} gradient="warning" delay={0.2} />
         <StatCard title="Remaining Balance" value={cards.balance} icon={<FaWallet />} gradient="success" delay={0.25} />
         <StatCard title="Savings" value={cards.savings} icon={<FaPiggyBank />} gradient="success" delay={0.3} />
-        <StatCard title="Expense Ratio" value={cards.expenseRatio} prefix="" icon={<FaArrowUp />} gradient="danger" delay={0.35} subtitle="% of income spent" />
+        <StatCard title="Expense Ratio" value={cards.ExpenseRatio} prefix="" icon={<FaArrowUp />} gradient="danger" delay={0.35} subtitle="% of income spent" />
       </div>
 
       <div className="dashboard-grid">

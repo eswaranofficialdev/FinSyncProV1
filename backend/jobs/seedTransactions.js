@@ -9,7 +9,7 @@ const User = require("../models/User");
 const transactions = [
   // 1
   {
-    type: "expense",
+    type: "Expense",
     category: "Food",
     amount: 450,
     date: "2026-01-05T12:30:00.000Z",
@@ -38,7 +38,7 @@ const transactions = [
 
   // 3
   {
-    type: "expense",
+    type: "Expense",
     category: "Travel",
     amount: 280,
     date: "2026-02-03T08:15:00.000Z",
@@ -52,7 +52,7 @@ const transactions = [
 
   // 4
   {
-    type: "expense",
+    type: "Expense",
     category: "Shopping",
     amount: 2499,
     date: "2026-02-10T16:45:00.000Z",
@@ -66,7 +66,7 @@ const transactions = [
 
   // 5
   {
-    type: "expense",
+    type: "Expense",
     category: "Bills",
     amount: 1299,
     date: "2026-02-15T10:00:00.000Z",
@@ -95,7 +95,7 @@ const transactions = [
 
   // 7
   {
-    type: "expense",
+    type: "Expense",
     category: "Entertainment",
     amount: 699,
     date: "2026-02-25T19:30:00.000Z",
@@ -109,7 +109,7 @@ const transactions = [
 
   // 8
   {
-    type: "expense",
+    type: "Expense",
     category: "Food",
     amount: 3250,
     date: "2026-03-02T11:20:00.000Z",
@@ -123,7 +123,7 @@ const transactions = [
 
   // 9
   {
-    type: "expense",
+    type: "Expense",
     category: "Health",
     amount: 1200,
     date: "2026-03-08T17:00:00.000Z",
@@ -152,7 +152,7 @@ const transactions = [
 
   // 11
   {
-    type: "expense",
+    type: "Expense",
     category: "Food",
     amount: 850,
     date: "2026-04-04T13:15:00.000Z",
@@ -166,7 +166,7 @@ const transactions = [
 
   // 12
   {
-    type: "expense",
+    type: "Expense",
     category: "Bills",
     amount: 1850,
     date: "2026-04-12T10:30:00.000Z",
@@ -181,7 +181,7 @@ const transactions = [
 
   // 13
   {
-    type: "expense",
+    type: "Expense",
     category: "Education",
     amount: 4500,
     date: "2026-04-18T15:00:00.000Z",
@@ -209,11 +209,11 @@ const transactions = [
 
   // 15
   {
-    type: "expense",
+    type: "Expense",
     category: "Travel",
     amount: 3200,
     date: "2026-05-14T09:30:00.000Z",
-    description: "Fuel and transportation expenses",
+    description: "Fuel and transportation Expenses",
     paymentMode: "Card",
     status: "completed",
     tags: ["fuel", "travel"],
@@ -238,7 +238,7 @@ const transactions = [
 
   // 17
   {
-    type: "expense",
+    type: "Expense",
     category: "Rent",
     amount: 18000,
     date: "2026-06-01T08:00:00.000Z",
@@ -253,11 +253,11 @@ const transactions = [
 
   // 18
   {
-    type: "expense",
+    type: "Expense",
     category: "Travel",
     amount: 7500,
     date: "2026-06-15T07:30:00.000Z",
-    description: "Weekend trip expenses",
+    description: "Weekend trip Expenses",
     paymentMode: "Card",
     status: "completed",
     tags: ["travel", "trip"],

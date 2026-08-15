@@ -6,7 +6,7 @@ const notificationSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: [
-        'expense_added', 'user_created', 'settlement_pending', 'approval_pending',
+        'Expense_added', 'user_created', 'settlement_pending', 'approval_pending',
         'password_changed', 'community_invite', 'admin_approved', 'admin_rejected', 'general',
         'settlement_requested', 'settlement_approved', 'settlement_rejected',
       ],

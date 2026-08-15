@@ -4,7 +4,7 @@ const Transaction = require('../models/Transaction');
 const CommunityMember = require('../models/CommunityMember');
 const ApiResponse = require('../utils/apiResponse');
 
-// @desc    Dashboard summary: today/week/month/year totals, income vs expense, category breakdown, trend
+// @desc    Dashboard summary: today/week/month/year totals, income vs Expense, category breakdown, trend
 //          Always scoped to the logged-in user's own data — nobody, including
 //          superadmin, can view another user's personal dashboard.
 // @route   GET /api/dashboard
@@ -33,10 +33,10 @@ exports.getDashboard = asyncHandler(async (req, res) => {
     monthIncome, yearIncome,
     communityExpense,
   ] = await Promise.all([
-    sumFor('expense', ranges.today),
-    sumFor('expense', ranges.week),
-    sumFor('expense', ranges.month),
-    sumFor('expense', ranges.year),
+    sumFor('Expense', ranges.today),
+    sumFor('Expense', ranges.week),
+    sumFor('Expense', ranges.month),
+    sumFor('Expense', ranges.year),
     sumFor('income', ranges.month),
     sumFor('income', ranges.year),
     Transaction.aggregate([
@@ -47,17 +47,17 @@ exports.getDashboard = asyncHandler(async (req, res) => {
 
   const balance = yearIncome - yearExpense;
   const savings = Math.max(balance, 0);
-  const expenseRatio = yearIncome > 0 ? Math.round((yearExpense / yearIncome) * 100) : 0;
+  const ExpenseRatio = yearIncome > 0 ? Math.round((yearExpense / yearIncome) * 100) : 0;
 
   // Top categories this month
   const topCategories = await Transaction.aggregate([
-    { $match: { ...ownerFilter, type: 'expense', date: { $gte: ranges.month[0], $lte: ranges.month[1] } } },
+    { $match: { ...ownerFilter, type: 'Expense', date: { $gte: ranges.month[0], $lte: ranges.month[1] } } },
     { $group: { _id: '$category', total: { $sum: '$amount' } } },
     { $sort: { total: -1 } },
     { $limit: 5 },
   ]);
 
-  // Monthly trend (last 6 months): income vs expense
+  // Monthly trend (last 6 months): income vs Expense
   const sixMonthsAgo = now.subtract(5, 'month').startOf('month').toDate();
   const trend = await Transaction.aggregate([
     { $match: { ...ownerFilter, date: { $gte: sixMonthsAgo } } },
@@ -79,7 +79,7 @@ exports.getDashboard = asyncHandler(async (req, res) => {
     cards: {
       todayExpense, weekExpense, monthExpense, yearExpense,
       monthIncome, yearIncome, communityExpense,
-      balance, savings, expenseRatio,
+      balance, savings, ExpenseRatio,
     },
     topCategories,
     trend,
@@ -118,7 +118,7 @@ exports.getReports = asyncHandler(async (req, res) => {
       $group: {
         _id: groupIdMap[groupBy] || groupIdMap.month,
         totalIncome: { $sum: { $cond: [{ $eq: ['$type', 'income'] }, '$amount', 0] } },
-        totalExpense: { $sum: { $cond: [{ $eq: ['$type', 'expense'] }, '$amount', 0] } },
+        totalExpense: { $sum: { $cond: [{ $eq: ['$type', 'Expense'] }, '$amount', 0] } },
         count: { $sum: 1 },
       },
     },

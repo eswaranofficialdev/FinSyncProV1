@@ -4,7 +4,7 @@ const ApiResponse = require('../utils/apiResponse');
 
 // PRIVACY RULE: Personal transactions belong strictly to their owner. No role —
 // including superadmin — may list, view, edit, or delete another user's personal
-// transactions. Community expense visibility is handled separately via
+// transactions. Community Expense visibility is handled separately via
 // communityController.getCommunityTransactions, which is scoped to community members.
 
 // @desc    List MY OWN transactions

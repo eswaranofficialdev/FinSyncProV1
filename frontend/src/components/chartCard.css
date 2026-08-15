@@ -75,7 +75,7 @@
 }
 
 .stat-dot.income { background: #10B981; }
-.stat-dot.expense { background: #F43F5E; }
+.stat-dot.Expense { background: #F43F5E; }
 
 .stat-label {
   color: var(--text-secondary, #64748b);

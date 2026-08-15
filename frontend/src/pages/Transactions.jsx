@@ -42,11 +42,11 @@ const CATEGORIES = [
 
 
 const TYPES = [
-  'income',
-  'expense',
-  'investment',
-  'loan',
-  'savings',
+  'Income',
+  'Expense',
+  'Investment',
+  'Loan',
+  'Savings',
 ];
 
 
@@ -178,12 +178,12 @@ const Transactions = () => {
 
 
     reset({
-      type: 'expense',
+      type: 'Expense',
       category: 'Others',
       amount: '',
       date: dayjs().format('YYYY-MM-DD'),
       description: '',
-      paymentMode: 'Cash',
+      paymentMode: 'UPI',
     });
 
 
@@ -283,7 +283,7 @@ const Transactions = () => {
 
 
           <p className="page-subtitle">
-            Track every income, expense, and investment
+            Track every income, Expense, and investment
           </p>
         </div>
 
@@ -345,7 +345,6 @@ const Transactions = () => {
             </option>
           ))}
         </select>
-
 
 
         <select
@@ -471,7 +470,7 @@ const Transactions = () => {
 
                         <span
                           className="badge badge-warning"
-                          title="Shared community expense"
+                          title="Shared community Expense"
                         >
                           <FaUsers
                             style={{
