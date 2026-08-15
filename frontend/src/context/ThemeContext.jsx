@@ -20,68 +20,119 @@ export const COLOR_THEMES = [
     color: '#4F46E5',
     secondary: '#06B6D4',
   },
-
   {
     id: 'emerald',
     name: 'Emerald',
     color: '#10B981',
     secondary: '#14B8A6',
   },
-
   {
     id: 'purple',
     name: 'Royal Purple',
     color: '#7C3AED',
     secondary: '#C026D3',
   },
-
   {
     id: 'blue',
     name: 'Royal Blue',
     color: '#2563EB',
     secondary: '#0EA5E9',
   },
-
   {
     id: 'rose',
     name: 'Rose',
     color: '#E11D48',
     secondary: '#DB2777',
   },
-
   {
     id: 'gold',
     name: 'Gold',
     color: '#D97706',
     secondary: '#CA8A04',
   },
-
   {
     id: 'cyber',
     name: 'Cyber Neon',
     color: '#06B6D4',
     secondary: '#A855F7',
   },
-
   {
     id: 'midnight',
     name: 'Midnight',
     color: '#6366F1',
     secondary: '#8B5CF6',
   },
-
   {
     id: 'ocean',
     name: 'Ocean',
     color: '#0891B2',
     secondary: '#0D9488',
   },
-
   {
     id: 'finance',
     name: 'Finance',
     color: '#22C55E',
     secondary: '#14B8A6',
+  },
+  {
+    id: 'aurora',
+    name: 'Aurora',
+    color: '#22D3EE',
+    secondary: '#A78BFA',
+  },
+  {
+    id: 'sunset',
+    name: 'Sunset',
+    color: '#F97316',
+    secondary: '#EC4899',
+  },
+  {
+    id: 'forest',
+    name: 'Forest',
+    color: '#15803D',
+    secondary: '#84CC16',
+  },
+  {
+    id: 'lavender',
+    name: 'Lavender',
+    color: '#A855F7',
+    secondary: '#E879F9',
+  },
+  {
+    id: 'crimson',
+    name: 'Crimson',
+    color: '#DC2626',
+    secondary: '#F43F5E',
+  },
+  {
+    id: 'arctic',
+    name: 'Arctic',
+    color: '#38BDF8',
+    secondary: '#E0F2FE',
+  },
+  {
+    id: 'slate',
+    name: 'Slate',
+    color: '#475569',
+    secondary: '#94A3B8',
+  },
+  {
+    id: 'lime',
+    name: 'Neon Lime',
+    color: '#84CC16',
+    secondary: '#22C55E',
+  },
+  {
+    id: 'copper',
+    name: 'Copper',
+    color: '#C2410C',
+    secondary: '#F59E0B',
+  },
+  {
+    id: 'glass',
+    name: 'Realistic Glass',
+    color: '#7DD3FC',
+    secondary: '#C4B5FD',
   },
 ];
 

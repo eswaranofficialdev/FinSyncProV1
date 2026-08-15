@@ -346,3 +346,330 @@
   --surface:
     rgba(23, 37, 84, 0.35);
 }
+
+/* =========================================================
+   THEME 11 — AURORA
+   ========================================================= */
+
+[data-color-theme='aurora'] {
+  --color-primary: #22D3EE;
+  --color-primary-light: #67E8F9;
+  --color-primary-dark: #0891B2;
+
+  --color-secondary: #A78BFA;
+
+  --color-primary-rgb: 34, 211, 238;
+  --color-secondary-rgb: 167, 139, 250;
+}
+
+
+/* =========================================================
+   THEME 12 — SUNSET
+   ========================================================= */
+
+[data-color-theme='sunset'] {
+  --color-primary: #F97316;
+  --color-primary-light: #FB923C;
+  --color-primary-dark: #C2410C;
+
+  --color-secondary: #EC4899;
+
+  --color-primary-rgb: 249, 115, 22;
+  --color-secondary-rgb: 236, 72, 153;
+}
+
+
+/* =========================================================
+   THEME 13 — FOREST
+   ========================================================= */
+
+[data-color-theme='forest'] {
+  --color-primary: #15803D;
+  --color-primary-light: #22C55E;
+  --color-primary-dark: #166534;
+
+  --color-secondary: #84CC16;
+
+  --color-primary-rgb: 21, 128, 61;
+  --color-secondary-rgb: 132, 204, 22;
+}
+
+
+/* =========================================================
+   THEME 14 — LAVENDER
+   ========================================================= */
+
+[data-color-theme='lavender'] {
+  --color-primary: #A855F7;
+  --color-primary-light: #C084FC;
+  --color-primary-dark: #7E22CE;
+
+  --color-secondary: #E879F9;
+
+  --color-primary-rgb: 168, 85, 247;
+  --color-secondary-rgb: 232, 121, 249;
+}
+
+
+/* =========================================================
+   THEME 15 — CRIMSON
+   ========================================================= */
+
+[data-color-theme='crimson'] {
+  --color-primary: #DC2626;
+  --color-primary-light: #F87171;
+  --color-primary-dark: #991B1B;
+
+  --color-secondary: #F43F5E;
+
+  --color-primary-rgb: 220, 38, 38;
+  --color-secondary-rgb: 244, 63, 94;
+}
+
+
+/* =========================================================
+   THEME 16 — ARCTIC
+   ========================================================= */
+
+[data-color-theme='arctic'] {
+  --color-primary: #38BDF8;
+  --color-primary-light: #7DD3FC;
+  --color-primary-dark: #0284C7;
+
+  --color-secondary: #E0F2FE;
+
+  --color-primary-rgb: 56, 189, 248;
+  --color-secondary-rgb: 224, 242, 254;
+}
+
+
+/* =========================================================
+   THEME 17 — SLATE
+   ========================================================= */
+
+[data-color-theme='slate'] {
+  --color-primary: #475569;
+  --color-primary-light: #64748B;
+  --color-primary-dark: #1E293B;
+
+  --color-secondary: #94A3B8;
+
+  --color-primary-rgb: 71, 85, 105;
+  --color-secondary-rgb: 148, 163, 184;
+}
+
+
+/* =========================================================
+   THEME 18 — NEON LIME
+   ========================================================= */
+
+[data-color-theme='lime'] {
+  --color-primary: #84CC16;
+  --color-primary-light: #A3E635;
+  --color-primary-dark: #4D7C0F;
+
+  --color-secondary: #22C55E;
+
+  --color-primary-rgb: 132, 204, 22;
+  --color-secondary-rgb: 34, 197, 94;
+}
+
+
+/* =========================================================
+   THEME 19 — COPPER
+   ========================================================= */
+
+[data-color-theme='copper'] {
+  --color-primary: #C2410C;
+  --color-primary-light: #F97316;
+  --color-primary-dark: #9A3412;
+
+  --color-secondary: #F59E0B;
+
+  --color-primary-rgb: 194, 65, 12;
+  --color-secondary-rgb: 245, 158, 11;
+}
+
+
+/* =========================================================
+   THEME 20 — REALISTIC GLASS
+   ========================================================= */
+
+[data-color-theme='glass'] {
+  --color-primary: #7DD3FC;
+  --color-primary-light: #BAE6FD;
+  --color-primary-dark: #0284C7;
+
+  --color-secondary: #C4B5FD;
+
+  --color-primary-rgb: 125, 211, 252;
+  --color-secondary-rgb: 196, 181, 253;
+}
+/* =========================================================
+   NEW THEME LIGHT BACKGROUNDS
+   ========================================================= */
+
+[data-theme='light'][data-color-theme='aurora'] {
+  --bg: #F0FDFA;
+
+  --surface: rgba(255, 255, 255, 0.70);
+
+  --border: rgba(34, 211, 238, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(34, 211, 238, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='sunset'] {
+  --bg: #FFF7ED;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(249, 115, 22, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(249, 115, 22, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='forest'] {
+  --bg: #F0FDF4;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(21, 128, 61, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(21, 128, 61, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='lavender'] {
+  --bg: #FAF5FF;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(168, 85, 247, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(168, 85, 247, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='crimson'] {
+  --bg: #FFF1F2;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(220, 38, 38, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(220, 38, 38, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='arctic'] {
+  --bg: #F0F9FF;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(56, 189, 248, 0.20);
+
+  --shadow-soft:
+    0 8px 30px rgba(56, 189, 248, 0.14);
+}
+
+
+[data-theme='light'][data-color-theme='slate'] {
+  --bg: #F8FAFC;
+
+  --surface: rgba(255, 255, 255, 0.76);
+
+  --border: rgba(71, 85, 105, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(15, 23, 42, 0.10);
+}
+
+
+[data-theme='light'][data-color-theme='lime'] {
+  --bg: #F7FEE7;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(132, 204, 22, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(132, 204, 22, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='copper'] {
+  --bg: #FFF7ED;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(194, 65, 12, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(194, 65, 12, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='glass'] {
+  --bg: #E8F1F8;
+
+  --surface:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.58),
+      rgba(255, 255, 255, 0.20)
+    );
+
+  --surface-solid: rgba(255, 255, 255, 0.88);
+
+  --border:
+    rgba(255, 255, 255, 0.65);
+
+  --text-primary: #172033;
+  --text-secondary: #526174;
+  --text-muted: #8190A5;
+
+  --shadow-soft:
+    0 12px 40px rgba(31, 58, 85, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+
+  --shadow-strong:
+    0 25px 70px rgba(31, 58, 85, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.80);
+}
+
+
+[data-theme='dark'][data-color-theme='glass'] {
+  --bg: #07111D;
+
+  --surface:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12),
+      rgba(255, 255, 255, 0.035)
+    );
+
+  --surface-solid: rgba(15, 23, 42, 0.86);
+
+  --border:
+    rgba(255, 255, 255, 0.16);
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #B8C4D4;
+  --text-muted: #718096;
+
+  --shadow-soft:
+    0 15px 45px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  --shadow-strong:
+    0 25px 70px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
