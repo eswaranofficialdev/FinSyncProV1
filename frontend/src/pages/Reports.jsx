@@ -269,14 +269,26 @@ const Reports = () => {
             <motion.div className="glass-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: 24 }}>
               <h3 style={{ marginBottom: 16 }}>Cash Flow Trend</h3>
               <div style={{ height: 300 }}>
-                <Bar data={personalBarData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }} />
+                {loading ? (
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>Loading...</div>
+                ) : report.length === 0 ? (
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>No data available</div>
+                ) : (
+                  <Bar data={personalBarData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }} />
+                )}
               </div>
             </motion.div>
 
             <motion.div className="glass-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: 24 }}>
               <h3 style={{ marginBottom: 16 }}>Expense Distribution by Category</h3>
-              <div style={{ height: 300, display: 'flex', justifyContent: 'center' }}>
-                <Doughnut data={personalDoughnutData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }} />
+              <div style={{ height: 300, display: 'flex', justifyContent: 'center', width: '100%' }}>
+                {loading ? (
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>Loading...</div>
+                ) : report.length === 0 ? (
+                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>No data available</div>
+                ) : (
+                  <Doughnut data={personalDoughnutData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }} />
+                )}
               </div>
             </motion.div>
           </div>
@@ -334,28 +346,32 @@ const Reports = () => {
                 <tbody>
                   {loading ? (
                     <tr><td colSpan="4" style={{ textAlign: 'center' }}>Loading month data...</td></tr>
-                  ) : communityDetail.members.map((m) => {
-                    const spend = communityTxns
-                      .filter(t => (t.owner?._id || t.owner) === m.user?._id)
-                      .reduce((sum, t) => sum + t.amount, 0);
+                  ) : communityTxns.length === 0 ? (
+                    <tr><td colSpan="4" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No data found</td></tr>
+                  ) : (
+                    communityDetail.members.map((m) => {
+                      const spend = communityTxns
+                        .filter(t => (t.owner?._id || t.owner) === m.user?._id)
+                        .reduce((sum, t) => sum + t.amount, 0);
 
-                    const owes = communityTxns
-                      .filter(t => t.splitAmong?.some(u => (u._id || u) === m.user?._id))
-                      .reduce((sum, t) => sum + (t.amount / (t.splitAmong?.length || 1)), 0);
+                      const owes = communityTxns
+                        .filter(t => t.splitAmong?.some(u => (u._id || u) === m.user?._id))
+                        .reduce((sum, t) => sum + (t.amount / (t.splitAmong?.length || 1)), 0);
 
-                    const Expense = owes - spend;
+                      const Expense = owes - spend;
 
-                    return (
-                      <tr key={m._id}>
-                        <td data-label="Name">{m.user?.name}</td>
-                        <td data-label="Total Spend">₹{spend.toFixed(2)}</td>
-                        <td data-label="Total Owes">₹{owes.toFixed(2)}</td>
-                        <td data-label="Total Expense" style={{ color: Expense > 0 ? 'var(--color-danger)' : Expense < 0 ? 'var(--color-success)' : 'inherit', fontWeight: 'bold' }}>
-                          {Expense > 0 ? `Owes ₹${Expense.toFixed(2)}` : Expense < 0 ? `Collects ₹${Math.abs(Expense).toFixed(2)}` : '₹0.00'}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                      return (
+                        <tr key={m._id}>
+                          <td data-label="Name">{m.user?.name}</td>
+                          <td data-label="Total Spend">₹{spend.toFixed(2)}</td>
+                          <td data-label="Total Owes">₹{owes.toFixed(2)}</td>
+                          <td data-label="Total Expense" style={{ color: Expense > 0 ? 'var(--color-danger)' : Expense < 0 ? 'var(--color-success)' : 'inherit', fontWeight: 'bold' }}>
+                            {Expense > 0 ? `Owes ₹${Expense.toFixed(2)}` : Expense < 0 ? `Collects ₹${Math.abs(Expense).toFixed(2)}` : '₹0.00'}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
@@ -365,7 +381,13 @@ const Reports = () => {
           <motion.div className="glass-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: 24 }}>
             <h3 style={{ marginBottom: 16 }}>Member Share Comparison</h3>
             <div style={{ height: 300 }}>
-              <Bar data={memberShareData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
+              {loading ? (
+                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>Loading...</div>
+              ) : communityTxns.length === 0 ? (
+                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>No data available</div>
+              ) : (
+                <Bar data={memberShareData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
+              )}
             </div>
           </motion.div>
         </motion.div>

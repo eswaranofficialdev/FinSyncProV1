@@ -616,60 +616,104 @@
     0 8px 30px rgba(194, 65, 12, 0.12);
 }
 
+/* =========================================================
+   THEME 11 — GLASS (iOS / macOS Liquid Glass Finish)
+   ========================================================= */
+/* =========================================================
+   THEME 11 — CRYSTAL GLASS (VisionOS Acrylic)
+   ========================================================= */
 
-[data-theme='light'][data-color-theme='glass'] {
-  --bg: #E8F1F8;
+[data-color-theme='glass'] {
+  /* Slate/Azure tint to make the glass look premium */
+  --color-primary: #38BDF8;
+  --color-primary-light: #7DD3FC;
+  --color-primary-dark: #0284C7;
+  --color-secondary: #818CF8;
+  
+  --color-primary-rgb: 56, 189, 248;
+  --color-secondary-rgb: 129, 140, 248;
 
-  --surface:
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.58),
-      rgba(255, 255, 255, 0.20)
-    );
-
-  --surface-solid: rgba(255, 255, 255, 0.88);
-
-  --border:
-    rgba(255, 255, 255, 0.65);
-
-  --text-primary: #172033;
-  --text-secondary: #526174;
-  --text-muted: #8190A5;
-
-  --shadow-soft:
-    0 12px 40px rgba(31, 58, 85, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
-
-  --shadow-strong:
-    0 25px 70px rgba(31, 58, 85, 0.20),
-    inset 0 1px 0 rgba(255, 255, 255, 0.80);
+  /* Almost completely transparent body, sharp white top edge, soft bottom tint */
+  --gradient-primary: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(var(--color-primary-rgb), 0.02) 80%,
+    rgba(var(--color-primary-rgb), 0.15) 100%
+  );
 }
 
 
+
+/* --- DARK CRYSTAL --- */
 [data-theme='dark'][data-color-theme='glass'] {
-  --bg: #07111D;
-
-  --surface:
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.12),
-      rgba(255, 255, 255, 0.035)
-    );
-
-  --surface-solid: rgba(15, 23, 42, 0.86);
-
-  --border:
-    rgba(255, 255, 255, 0.16);
-
+  /* Deep void, no muddiness */
+  --bg: radial-gradient(circle at top right, #1E293B 0%, #020617 100%);
+  
+  --surface: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.10) 0%, 
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  
+  --surface-solid: rgba(15, 23, 42, 0.85);
+  --border: rgba(255, 255, 255, 0.15);
+  
   --text-primary: #F8FAFC;
-  --text-secondary: #B8C4D4;
-  --text-muted: #718096;
-
-  --shadow-soft:
-    0 15px 45px rgba(0, 0, 0, 0.30),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-
-  --shadow-strong:
-    0 25px 70px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --text-secondary: #94A3B8;
+  --text-muted: #475569;
+  
+  /* Very sharp, defined rims without heavy black smudges */
+  --shadow-soft: 
+    0 12px 30px -5px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.20);
+    
+  --shadow-strong: 
+    0 24px 50px -8px rgba(0, 0, 0, 0.60),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.30);
 }
+[data-theme='dark'][data-color-theme='glass'] select option,
+[data-theme='dark'][data-color-theme='glass'] select optgroup {
+  /* Forces a solid deep-space dark background so the white text pops */
+  background-color: #0F172A !important; 
+  color: #F8FAFC !important; 
+}
+
+
+/* --- DARK CRYSTAL --- */
+[data-theme='light'][data-color-theme='glass'] {
+  /* Deep void, no muddiness */
+  --bg: radial-gradient(circle at top right, #1E293B 0%, #020617 100%);
+  
+  --surface: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.10) 0%, 
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  
+  --surface-solid: rgba(15, 23, 42, 0.85);
+  --border: rgba(255, 255, 255, 0.15);
+  
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #475569;
+  
+  /* Very sharp, defined rims without heavy black smudges */
+  --shadow-soft: 
+    0 12px 30px -5px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.20);
+    
+  --shadow-strong: 
+    0 24px 50px -8px rgba(0, 0, 0, 0.60),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.30);
+}
+[data-theme='light'][data-color-theme='glass'] select option,
+[data-theme='light'][data-color-theme='glass'] select optgroup {
+  /* Forces a solid deep-space dark background so the white text pops */
+  background-color: #0F172A !important; 
+  color: #F8FAFC !important; 
+}
+
+
+
+
