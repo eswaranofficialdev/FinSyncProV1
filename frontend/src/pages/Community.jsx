@@ -6,8 +6,12 @@ import dayjs from 'dayjs';
 import {
   FaPlus, FaUserFriends, FaUsers, FaMoneyBillWave, FaUserPlus,
   FaTrash, FaCrown, FaUserShield, FaSearch, FaTimesCircle, FaReceipt,
+<<<<<<< Updated upstream
   FaHandHoldingUsd, FaCheck, FaTimes, FaClock, FaHistory, FaCalendarAlt,
   FaEdit
+=======
+  FaHandHoldingUsd, FaCheck, FaTimes, FaClock, FaHistory, FaCalendarAlt
+>>>>>>> Stashed changes
 } from 'react-icons/fa';
 import api from '../services/api';
 import Modal from '../components/Modal';
@@ -47,6 +51,7 @@ const Community = () => {
   const [requestsLoading, setRequestsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+<<<<<<< Updated upstream
   // Filter States
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM'));
   const [activeTab, setActiveTab] = useState('Expenses');
@@ -71,6 +76,11 @@ const Community = () => {
       },
     });
   };
+=======
+  // --- NEW: Filter States ---
+  const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM'));
+  const [activeTab, setActiveTab] = useState('expenses'); // 'expenses' | 'payments'
+>>>>>>> Stashed changes
 
   const { register, handleSubmit, reset, formState: { errors: createErrors } } = useForm({ mode: 'onChange' });
   const splitForm = useForm({ mode: 'onChange' });
@@ -91,6 +101,10 @@ const Community = () => {
 
   useEffect(() => { fetchCommunities(); }, [fetchCommunities]);
 
+<<<<<<< Updated upstream
+=======
+  // --- NEW: Auto-refresh data when month changes ---
+>>>>>>> Stashed changes
   useEffect(() => {
     if (detail?.community?._id) {
       fetchCommunityTransactions(detail.community._id, selectedMonth);
@@ -136,7 +150,10 @@ const Community = () => {
       const { data } = await api.get(`/communities/${id}`);
       setDetail(data.data);
       setSelectedMemberIds(data.data.members.map((m) => m.user?._id));
+<<<<<<< Updated upstream
       setShowReport(false);
+=======
+>>>>>>> Stashed changes
       fetchCommunityTransactions(id, selectedMonth);
       fetchSettlementRequests(id, selectedMonth);
     } catch (err) {
@@ -194,6 +211,7 @@ const Community = () => {
   };
 
   const onDeleteTransaction = async (txnId) => {
+<<<<<<< Updated upstream
     confirm(
       'Delete this community transaction? Split shares and balances will be successfully reversed.',
       async () => {
@@ -207,6 +225,16 @@ const Community = () => {
       },
       'Delete Transaction'
     );
+=======
+    if (!window.confirm('Delete this community transaction? Split shares and balances will be successfully reversed.')) return;
+    try {
+      await api.delete(`/communities/transactions/${txnId}`);
+      toast.success('Transaction deleted and balances recalculated');
+      openDetail(detail.community._id);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete transaction');
+    }
+>>>>>>> Stashed changes
   };
 
   const toggleSelectedMember = (id) => {
@@ -299,9 +327,15 @@ const Community = () => {
     );
   };
 
+  // --- UPDATED: Lifetime Payable Logic ---
   const myMembership = detail?.members.find((m) => m.user?._id === user?._id);
+<<<<<<< Updated upstream
   const myPayableRaw = myMembership
     ? (myMembership.totalOwed + (myMembership.totalReceived || 0)) - (myMembership.totalContributed + (myMembership.totalPaid || 0))
+=======
+  const myPayableRaw = myMembership 
+    ? (myMembership.totalOwed + (myMembership.totalReceived || 0)) - (myMembership.totalContributed + (myMembership.totalPaid || 0)) 
+>>>>>>> Stashed changes
     : 0;
   const myPayable = Math.max(0, myPayableRaw);
 
@@ -359,6 +393,7 @@ const Community = () => {
   };
 
   const cancelRequest = async (requestId) => {
+<<<<<<< Updated upstream
     confirm(
       'Are you sure you want to cancel this payment request?',
       async () => {
@@ -372,6 +407,16 @@ const Community = () => {
       },
       'Cancel Request'
     );
+=======
+    if (!window.confirm('Are you sure you want to cancel this payment request?')) return;
+    try {
+      await api.delete(`/communities/${detail.community._id}/settlement-requests/${requestId}`);
+      toast.success('Payment request cancelled');
+      fetchSettlementRequests(detail.community._id);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to cancel request');
+    }
+>>>>>>> Stashed changes
   };
 
   // ---------- Detail view ----------
@@ -384,16 +429,28 @@ const Community = () => {
     const canDelete = isOwner || isSuperAdmin;
     const canManageTransactions = isOwner || isCommunityAdmin;
 
+<<<<<<< Updated upstream
     const currentMonthTxns = communityTxns.filter(t => dayjs(t.date).format('YYYY-MM') === selectedMonth);
     const monthlyTotalExpense = currentMonthTxns.reduce((sum, t) => sum + t.amount, 0);
 
     const pendingRequests = settlementRequests.filter((r) => r.status === 'pending');
+=======
+    const monthlyTotalExpense = communityTxns.reduce((sum, t) => sum + t.amount, 0);
+
+    const pendingRequests = settlementRequests.filter((r) => {
+      if (r.status !== 'pending') return false;
+      const isSender = r.fromUser?._id === user?._id;
+      const isRecipient = r.toUser?._id === user?._id;
+      return isSender || isRecipient;
+    });
+>>>>>>> Stashed changes
 
     const completedPayments = settlementRequests.filter((r) => r.status === 'approved' || r.status === 'completed');
     const currentMonthPayments = completedPayments.filter(p => dayjs(p.updatedAt || p.createdAt).format('YYYY-MM') === selectedMonth);
 
     return (
       <div>
+<<<<<<< Updated upstream
         {!showReport ? (
           <>
             <div className="page-title-row">
@@ -897,6 +954,317 @@ const Community = () => {
             </div>
           </form>
         </Modal>
+=======
+        <div className="page-title-row">
+          <div>
+            <button className="btn btn-outline" onClick={() => { setDetail(null); }} style={{ marginBottom: 12 }}>← Back</button>
+            <h1>{detail.community.name}</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+              <p className="page-subtitle" style={{ margin: 0 }}>
+                {detail.community.type} · {detail.members.length} members
+                {isSuperAdmin && !isOwner && !isCommunityAdmin && <span className="badge badge-warning" style={{ marginLeft: 10 }}>Oversight View</span>}
+              </p>
+              {/* Dynamic Month Filter */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: 8 }}>
+                <FaCalendarAlt size={14} color="var(--color-primary)" />
+                <input 
+                  type="month" 
+                  value={selectedMonth} 
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  style={{ border: 'none', background: 'transparent', color: 'inherit', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
+                />
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {canManageMembers && (
+              <motion.button className="btn btn-outline" onClick={() => setAddMemberOpen(true)} whileTap={{ scale: 0.96 }}>
+                <FaUserPlus /> Add Member
+              </motion.button>
+            )}
+            {myMembership && myPayable > 0 && (
+              <motion.button className="btn btn-outline" onClick={openPayModal} whileTap={{ scale: 0.96 }}>
+                <FaHandHoldingUsd /> Pay Dues
+              </motion.button>
+            )}
+            {canAddExpense && (
+              <motion.button className="btn btn-primary" onClick={() => setSplitOpen(true)} whileTap={{ scale: 0.96 }}>
+                <FaMoneyBillWave /> Split Expense
+              </motion.button>
+            )}
+            {canDelete && (
+              <motion.button className="btn btn-danger" onClick={onDeleteCommunity} whileTap={{ scale: 0.96 }}>
+                <FaTrash /> Delete
+              </motion.button>
+            )}
+          </div>
+        </div>
+
+        <div className="stat-grid" style={{ marginBottom: 20 }}>
+          <div className="glass-card" style={{ padding: 20 }}>
+            <p className="page-subtitle">Community Expense ({dayjs(selectedMonth).format('MMM YYYY')})</p>
+            <h2>₹{monthlyTotalExpense.toLocaleString()}</h2>
+          </div>
+          {myMembership && (
+            <div className="glass-card" style={{ padding: 20 }}>
+              <p className="page-subtitle">Your Lifetime Balance</p>
+              <h2 style={{ color: myPayableRaw > 0 ? 'var(--color-danger)' : 'var(--color-success)' }}>
+                {myPayableRaw > 0
+                  ? `Payable ₹${myPayableRaw.toFixed(2)}`
+                  : myPayableRaw < 0
+                    ? `Collect ₹${Math.abs(myPayableRaw).toFixed(2)}`
+                    : 'All settled up'}
+              </h2>
+            </div>
+          )}
+        </div>
+
+        {pendingRequests.length > 0 && (
+          <div className="glass-card" style={{ padding: 20, marginBottom: 20 }}>
+            <h3 style={{ marginBottom: 16 }}>
+              <FaClock style={{ marginRight: 8 }} />
+              Payment Requests & Approvals
+            </h3>
+            <div className="settlement-request-list">
+              {pendingRequests.map((r) => {
+                const isRecipient = r.toUser?._id === user?._id;
+                return (
+                  <div key={r._id} className="settlement-request-item">
+                    <div>
+                      <p className="notif-title" style={{ fontSize: '0.9rem' }}>
+                        {isRecipient 
+                          ? `${r.fromUser?.name || 'A member'} wants to pay you` 
+                          : `You requested to pay ${r.toUser?.name || 'a member'}`}
+                      </p>
+                      <p className="page-subtitle" style={{ fontSize: '0.8rem' }}>Amount: <strong>₹{r.amount.toFixed(2)}</strong></p>
+                      <p className="page-subtitle" style={{ fontSize: '0.75rem' }}>{dayjs(r.createdAt).format('DD MMM YYYY, hh:mm A')}</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      {isRecipient ? (
+                        <>
+                          <button className="btn btn-primary" style={{ padding: '8px 14px', fontSize: '0.78rem' }} onClick={() => respondToRequest(r._id, 'approve')}>
+                            <FaCheck /> Accept
+                          </button>
+                          <button className="btn btn-outline" style={{ padding: '8px 14px', fontSize: '0.78rem' }} onClick={() => respondToRequest(r._id, 'reject')}>
+                            <FaTimes /> Reject
+                          </button>
+                        </>
+                      ) : (
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <span className="badge badge-warning">Waiting for Approval</span>
+                          <button 
+                            className="btn btn-outline" 
+                            style={{ padding: '6px 12px', fontSize: '0.75rem', borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }} 
+                            onClick={() => cancelRequest(r._id)}
+                            title="Cancel Request"
+                          >
+                            <FaTimes style={{ marginRight: 4 }} /> Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* --- MEMBERS TABLE AT THE TOP --- */}
+        <div className="glass-card" style={{ padding: 20, marginBottom: 20 }}>
+          <h3 style={{ marginBottom: 16 }}>Members & Balance Sheet</h3>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Total Spent ({dayjs(selectedMonth).format('MMM YYYY')})</th>
+                  <th>Payable / Collect (Lifetime)</th>
+                  {canManageMembers && <th>Actions</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {detail.members.map((m) => {
+                  // LIFETIME BALANCE (STATIC)
+                  const rawPayable = (m.totalOwed + (m.totalReceived || 0)) - (m.totalContributed + (m.totalPaid || 0));
+                  const isNegative = rawPayable < 0;
+                  const displayPayable = Math.max(0, rawPayable);
+
+                  // MONTHLY DYNAMIC SPENDING
+                  const monthlySpent = communityTxns
+                    .filter(t => (t.owner?._id || t.owner) === m.user?._id)
+                    .reduce((sum, t) => sum + t.amount, 0);
+
+                  return (
+                    <tr key={m._id}>
+                      <td data-label="Name">{m.user?.name}</td>
+                      <td data-label="Role">
+                        <span className={`badge ${roleBadge(m.role)}`}>
+                          {m.role === 'owner' && <FaCrown style={{ marginRight: 4 }} />}
+                          {m.role === 'admin' && <FaUserShield style={{ marginRight: 4 }} />}
+                          {m.role}
+                        </span>
+                      </td>
+                      <td data-label={`Total Spent (${dayjs(selectedMonth).format('MMM')})`}>
+                        ₹{monthlySpent.toLocaleString()}
+                      </td>
+                      <td data-label="Payable / Collect (Lifetime)">
+                        {isNegative ? (
+                          <span className="badge badge-warning" style={{ fontWeight: 'bold' }}>
+                            Collect ₹{Math.abs(rawPayable).toFixed(2)}
+                          </span>
+                        ) : rawPayable > 0 ? (
+                          <strong style={{ color: 'var(--color-danger)' }}>Payable ₹{displayPayable.toFixed(2)}</strong>
+                        ) : (
+                          <strong style={{ color: 'var(--color-success)' }}>Settled</strong>
+                        )}
+                      </td>
+                      {canManageMembers && (
+                        <td data-label="Actions">
+                          {m.role !== 'owner' && (
+                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                              {m.role === 'member' ? (
+                                <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.75rem' }} onClick={() => onChangeRole(m.user?._id, 'admin')}>
+                                  Make Admin
+                                </button>
+                              ) : (
+                                <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.75rem' }} onClick={() => onChangeRole(m.user?._id, 'member')}>
+                                  Remove Admin
+                                </button>
+                              )}
+                              <button className="icon-btn" title="Remove member" onClick={() => onRemoveMember(m.user?._id, m.user?.name)}>
+                                <FaTrash />
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* --- TRANSACTIONS & PAYMENTS TOGGLE AT THE BOTTOM --- */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+          <button 
+            className={`btn ${activeTab === 'expenses' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => setActiveTab('expenses')}
+          >
+            <FaReceipt style={{ marginRight: 6 }}/> Community Expenses
+          </button>
+          <button 
+            className={`btn ${activeTab === 'payments' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => setActiveTab('payments')}
+          >
+            <FaHistory style={{ marginRight: 6 }}/> Paid Transactions
+          </button>
+        </div>
+
+        {activeTab === 'expenses' && (
+          <div className="glass-card" style={{ padding: 20 }}>
+            <h3 style={{ marginBottom: 16 }}>Community Expenses ({dayjs(selectedMonth).format('MMMM YYYY')})</h3>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Paid By</th>
+                    <th>Involved Members</th>
+                    <th>Split / Member</th>
+                    <th>Date & Time</th>
+                    {canManageTransactions && <th>Actions</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {txnLoading ? (
+                    <tr><td colSpan={canManageTransactions ? 7 : 6} style={{ textAlign: 'center' }}>Loading...</td></tr>
+                  ) : communityTxns.length === 0 ? (
+                    <tr><td colSpan={canManageTransactions ? 7 : 6} style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No expenses recorded this month</td></tr>
+                  ) : communityTxns.map((t) => {
+                    const involvedCount = t.splitAmong?.length || 1;
+                    const splitPerPerson = (t.amount / involvedCount).toFixed(2);
+                    const involvedNames = t.splitAmong?.map(u => u.name || 'Unknown').join(', ') || `${involvedCount} members`;
+                    
+                    // 🌟 5-Minute Delete Lock check
+                    const canDeleteTxn = dayjs().diff(dayjs(t.createdAt), 'minute') <= 5;
+
+                    return (
+                      <tr key={t._id}>
+                        <td data-label="Description">
+                          {t.description || '(no description)'}
+                          <br /><span className="badge badge-info" style={{ marginTop: 4, display: 'inline-block' }}>{t.category}</span>
+                        </td>
+                        <td data-label="Amount"><strong>₹{t.amount.toLocaleString()}</strong></td>
+                        <td data-label="Paid By">{t.owner?.name || 'Unknown'}</td>
+                        <td data-label="Involved Members" style={{ fontSize: '0.85rem' }}>{involvedNames}</td>
+                        <td data-label="Split / Member" style={{ color: 'var(--color-danger)' }}>₹{splitPerPerson}</td>
+                        <td data-label="Date & Time">{dayjs(t.date).format('DD MMM YYYY, hh:mm A')}</td>
+                        {canManageTransactions && (
+                          <td data-label="Actions">
+                            <div style={{ display: 'flex', gap: 6 }}>
+                              {canDeleteTxn ? (
+                                <button className="icon-btn" title="Delete Transaction (Within 5 mins)" onClick={() => onDeleteTransaction(t._id)}>
+                                  <FaTrash />
+                                </button>
+                              ) : (
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Locked</span>
+                              )}
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'payments' && (
+          <div className="glass-card" style={{ padding: 20 }}>
+            <h3 style={{ marginBottom: 16 }}>Paid Transactions ({dayjs(selectedMonth).format('MMMM YYYY')})</h3>
+            <p className="page-subtitle" style={{ marginTop: -10, marginBottom: 16 }}>
+              Record of all accepted payments and settlements within the community.
+            </p>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Member Who Paid</th>
+                    <th>Paid To (Recipient)</th>
+                    <th>Amount Paid</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {completedPayments.length === 0 ? (
+                    <tr><td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No payments recorded this month.</td></tr>
+                  ) : completedPayments.map(p => (
+                    <tr key={p._id}>
+                      <td data-label="Member Who Paid"><strong>{p.fromUser?.name || 'Unknown'}</strong></td>
+                      <td data-label="Paid To"><strong>{p.toUser?.name || 'Community Creditor'}</strong></td>
+                      <td data-label="Amount Paid" style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
+                        ₹{p.amount.toFixed(2)}
+                      </td>
+                      <td data-label="Date & Time">{dayjs(p.updatedAt || p.createdAt).format('DD MMM YYYY, hh:mm A')}</td>
+                      <td data-label="Status"><span className="badge badge-success">Accepted</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* --- MODALS FOR DETAIL VIEW --- */}
+>>>>>>> Stashed changes
 
         {/* Split Expense Modal */}
         <Modal
@@ -915,6 +1283,7 @@ const Community = () => {
           <form onSubmit={splitForm.handleSubmit(onSplitExpense)}>
             <div className="form-group">
               <label className="form-label">Amount</label>
+<<<<<<< Updated upstream
               <input
                 className="form-input"
                 type="number"
@@ -924,6 +1293,17 @@ const Community = () => {
                   min: { value: 1, message: 'Minimum amount is 1' },
                   max: { value: 999999, message: 'Maximum 6 digits allowed' }
                 })}
+=======
+              <input 
+                className="form-input" 
+                type="number" 
+                step="0.01" 
+                {...splitForm.register('amount', { 
+                  required: 'Amount is required', 
+                  min: { value: 1, message: 'Minimum amount is 1' },
+                  max: { value: 999999, message: 'Maximum 6 digits allowed' }
+                })} 
+>>>>>>> Stashed changes
               />
               {splitForm.formState.errors.amount && (
                 <span className="form-error">{splitForm.formState.errors.amount.message}</span>
@@ -939,6 +1319,7 @@ const Community = () => {
 
             <div className="form-group">
               <label className="form-label">Description</label>
+<<<<<<< Updated upstream
               <input
                 className="form-input"
                 {...splitForm.register('description', {
@@ -953,6 +1334,13 @@ const Community = () => {
                     return true;
                   }
                 })}
+=======
+              <input 
+                className="form-input" 
+                {...splitForm.register('description', {
+                  maxLength: { value: 50, message: 'Maximum 50 characters allowed' }
+                })} 
+>>>>>>> Stashed changes
               />
               {splitForm.formState.errors.description && (
                 <span className="form-error">{splitForm.formState.errors.description.message}</span>
@@ -998,7 +1386,11 @@ const Community = () => {
 
             <div className="form-group">
               <label className="form-label">Select Creditor (Payee)</label>
+<<<<<<< Updated upstream
               <select
+=======
+              <select 
+>>>>>>> Stashed changes
                 className="form-input"
                 value={selectedPayeeId}
                 onChange={(e) => setSelectedPayeeId(e.target.value)}
@@ -1010,8 +1402,13 @@ const Community = () => {
                     const rawPayable = (m.totalOwed + (m.totalReceived || 0)) - (m.totalContributed + (m.totalPaid || 0));
                     const isCreditor = rawPayable < 0;
                     return (
+<<<<<<< Updated upstream
                       <option
                         key={m.user?._id}
+=======
+                      <option 
+                        key={m.user?._id} 
+>>>>>>> Stashed changes
                         value={m.user?._id}
                       >
                         {m.user?.name} {isCreditor ? `(Collects ₹${Math.abs(rawPayable).toFixed(2)})` : '(No money to collect)'}
@@ -1138,6 +1535,7 @@ const Community = () => {
         <form onSubmit={handleSubmit(onCreate)}>
           <div className="form-group">
             <label className="form-label">Name</label>
+<<<<<<< Updated upstream
             <input
               className="form-input"
               {...register('name', {
@@ -1145,6 +1543,15 @@ const Community = () => {
                 minLength: { value: 3, message: 'Minimum 3 characters required' },
                 maxLength: { value: 20, message: 'Maximum 20 characters allowed' }
               })}
+=======
+            <input 
+              className="form-input" 
+              {...register('name', { 
+                required: 'Community name is required',
+                minLength: { value: 3, message: 'Minimum 3 characters required' },
+                maxLength: { value: 20, message: 'Maximum 20 characters allowed' }
+              })} 
+>>>>>>> Stashed changes
             />
             {createErrors.name && (
               <span className="form-error">{createErrors.name.message}</span>
@@ -1160,14 +1567,24 @@ const Community = () => {
 
           <div className="form-group">
             <label className="form-label">Description</label>
+<<<<<<< Updated upstream
             <textarea
               className="form-input"
               rows="3"
+=======
+            <textarea 
+              className="form-input" 
+              rows="3" 
+>>>>>>> Stashed changes
               {...register('description', {
                 required: 'Description is required',
                 minLength: { value: 3, message: 'Minimum 3 characters required' },
                 maxLength: { value: 30, message: 'Maximum 30 characters allowed' }
+<<<<<<< Updated upstream
               })}
+=======
+              })} 
+>>>>>>> Stashed changes
             />
             {createErrors.description && (
               <span className="form-error">{createErrors.description.message}</span>
