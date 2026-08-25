@@ -8,8 +8,8 @@ const {
   deleteCommunityTransaction,cancelSettlementRequest
 } = require('../controllers/communityController');
 const { protect } = require('../middlewares/auth');
-const { deleteCommunityTransaction } = require('../controllers/communityController');
-const {  cancelSettlementRequest} = require('../controllers/communityController');
+// const { deleteCommunityTransaction } = require('../controllers/communityController');
+// const {  cancelSettlementRequest} = require('../controllers/communityController');
 
 router.use(protect);
 
@@ -34,7 +34,6 @@ router.route('/:id/settlement-requests/:requestId')
   router.route('/:id/settle')
   .post(protect, settleBalance);
 
-router.delete('/transactions/:transactionId', deleteCommunityTransaction);
-router.delete('/:id/settlement-requests/:requestId', protect, cancelSettlementRequest);
+
 
 module.exports = router;
