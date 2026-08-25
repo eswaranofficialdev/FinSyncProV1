@@ -7,5 +7,5 @@ router.use(protect);
 router.route('/').get(getBudgets).post(setBudget);
 router.route('/:id').delete(deleteBudget);
 router.get('/recommendations', getBudgetRecommendations);
-
+//budgets
 module.exports = router;
