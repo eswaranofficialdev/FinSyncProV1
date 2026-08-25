@@ -50,7 +50,7 @@ const Dashboard = () => {
         <StatCard title="Community Expense" value={cards.communityExpense} icon={<FaUsers />} gradient="warning" delay={0.2} />
         <StatCard title="Remaining Balance" value={cards.balance} icon={<FaWallet />} gradient="success" delay={0.25} />
         <StatCard title="Savings" value={cards.savings} icon={<FaPiggyBank />} gradient="success" delay={0.3} />
-        <StatCard title="Expense Ratio" value={cards.expenseRatio} prefix="" icon={<FaArrowUp />} gradient="danger" delay={0.35} subtitle="% of income spent" />
+        <StatCard title="Expense Ratio" value={cards.ExpenseRatio} prefix="" icon={<FaArrowUp />} gradient="danger" delay={0.35} subtitle="% of income spent" />
       </div>
 
       <div className="dashboard-grid">
@@ -68,15 +68,15 @@ const Dashboard = () => {
             <tbody>
               {recentTransactions.map((t) => (
                 <tr key={t._id}>
-                  <td data-label="Description">{t.description || t.transactionNumber}</td>
+                  <td data-label="Description">{t.description || "-"}</td>
                   <td data-label="Category">{t.category}</td>
                   <td data-label="Type">
                     <span className={`badge ${t.type === 'income' ? 'badge-success' : 'badge-danger'}`}>
                       {t.type === 'income' ? <FaArrowUp /> : <FaArrowDown />} {t.type}
                     </span>
                   </td>
-                  <td data-label="Amount">${t.amount.toLocaleString()}</td>
-                  <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY')}</td>
+                  <td data-label="Amount">₹{t.amount.toLocaleString()}</td>
+                  <td data-label="Date">{dayjs(t.date).format('DD MMM YYYY, hh:mm A')}</td>
                 </tr>
               ))}
               {recentTransactions.length === 0 && (

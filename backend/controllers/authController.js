@@ -21,7 +21,18 @@ exports.register = asyncHandler(async (req, res) => {
     return ApiResponse.error(res, 409, 'An account with this email already exists');
   }
 
+  // Optional: Add a uniqueness check loop for the 6-digit code if your user base grows large, 
+  // though a simple default handles standard use-cases.
+  let uid;
+  let isUnique = false;
+  while (!isUnique) {
+    uid = Math.floor(10000000 + Math.random() * 90000000).toString();
+    const existingUid = await User.findOne({ uid });
+    if (!existingUid) isUnique = true;
+  }
+
   const user = await User.create({
+    uid,
     name,
     email,
     password,
@@ -31,6 +42,7 @@ exports.register = asyncHandler(async (req, res) => {
 
   ApiResponse.success(res, 201, 'Registration successful. You can now log in.', {
     id: user._id,
+    uid: user.uid,
     email: user.email,
     status: user.status,
   });

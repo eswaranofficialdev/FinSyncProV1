@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaBriefcase, FaCalendarCheck } from 'react-icons/fa';
+import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaBriefcase, FaCalendarCheck, FaIdCard } from 'react-icons/fa';
 import dayjs from 'dayjs';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -33,8 +33,11 @@ const Profile = () => {
 
       <motion.div className="glass-card profile-hero" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
         <div className="profile-avatar-big">{user?.name?.[0]?.toUpperCase()}</div>
-        <div>
-          <h2>{user?.name}</h2>
+        <div className="profile-hero-content">
+          <div className="profile-name-row">
+            <h2>{user?.name}</h2>
+            {user?.uid && <span className="profile-uid-badge">ID: {user.uid}</span>}
+          </div>
           <span className="badge badge-info">{user?.role}</span>
           <p className="page-subtitle" style={{ marginTop: 8 }}>{user?.bio || 'No bio added yet.'}</p>
         </div>
@@ -44,6 +47,7 @@ const Profile = () => {
         <motion.div className="glass-card profile-info-card" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <h3>Contact Info</h3>
           <ul>
+            {user?.uid && <li><FaIdCard /> UID: <strong>{user.uid}</strong></li>}
             <li><FaEnvelope /> {user?.email}</li>
             <li><FaPhone /> {user?.phone || 'Not set'}</li>
             <li><FaMapMarkerAlt /> {user?.location || 'Not set'}</li>
@@ -56,8 +60,8 @@ const Profile = () => {
           <h3>Statistics</h3>
           {stats ? (
             <ul>
-              <li>Total Income: <strong>${stats.totalIncome.toLocaleString()}</strong></li>
-              <li>Total Expense: <strong>${stats.totalExpense.toLocaleString()}</strong></li>
+              <li>Total Income: <strong>₹{stats.totalIncome.toLocaleString()}</strong></li>
+              <li>Total Expense: <strong>₹{stats.totalExpense.toLocaleString()}</strong></li>
               <li>Communities Joined: <strong>{stats.communityCount}</strong></li>
             </ul>
           ) : (

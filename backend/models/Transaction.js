@@ -8,7 +8,7 @@ const transactionSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ['income', 'expense', 'investment', 'loan', 'savings'],
+      enum: ['income', 'Expense', 'investment', 'loan', 'savings'],
       required: true,
     },
     category: {
@@ -16,6 +16,7 @@ const transactionSchema = new mongoose.Schema(
       enum: [
         'Salary', 'Shopping', 'Bills', 'Travel', 'Health', 'Education',
         'Investment', 'Loan', 'Savings', 'Food', 'Rent', 'Entertainment', 'Others',
+        'Community Payment' // 🌟 ADDED: Required for settlement transactions to save without validation errors
       ],
       default: 'Others',
     },
@@ -42,6 +43,12 @@ const transactionSchema = new mongoose.Schema(
 
     reminder: { type: Date, default: null },
     isPinned: { type: Boolean, default: false },
+
+    // 🌟 ADDED: Fixes the "Cannot populate path splitAmong" error 🌟
+    splitAmong: [{ 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'User' 
+    }]
   },
   { timestamps: true }
 );
@@ -52,7 +59,7 @@ transactionSchema.index({ community: 1 });
 transactionSchema.pre('save', async function (next) {
   if (!this.isNew) return next();
   const count = await mongoose.model('Transaction').countDocuments();
-  this.transactionNumber = `TXN-${String(count + 1).padStart(6, '0')}`;
+  this.transactionNumber = `TXN-${Math.floor(100000 + Math.random() * 900000)}`;
   next();
 });
 

@@ -2,13 +2,54 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <meta name="theme-color" content="#4F46E5" />
+
     <title>FinSync Pro | Enterprise Finance Management</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Restore saved theme BEFORE React loads -->
+    <script>
+      (function () {
+        const theme =
+          localStorage.getItem('theme-mode') || 'light';
+
+        const colorTheme =
+          localStorage.getItem('color-theme') || 'indigo';
+
+        document.documentElement.setAttribute(
+          'data-theme',
+          theme
+        );
+
+        document.documentElement.setAttribute(
+          'data-color-theme',
+          colorTheme
+        );
+      })();
+    </script>
   </head>
+
   <body>
     <div id="root"></div>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

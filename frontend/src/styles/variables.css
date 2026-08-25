@@ -1,59 +1,719 @@
+/* =========================================================
+   COMMON VARIABLES
+   ========================================================= */
+
 :root {
-  --color-primary: #4F46E5;
-  --color-primary-light: #6366F1;
-  --color-secondary: #06B6D4;
-  --color-success: #22C55E;
-  --color-danger: #EF4444;
-  --color-warning: #F59E0B;
-
-  --bg-light: #F8FAFC;
-  --bg-dark: #111827;
-
-  --surface-light: rgba(255, 255, 255, 0.7);
-  --surface-dark: rgba(17, 24, 39, 0.6);
-
-  --border-light: rgba(255, 255, 255, 0.4);
-  --border-dark: rgba(255, 255, 255, 0.08);
-
-  --text-primary-light: #0F172A;
-  --text-secondary-light: #64748B;
-  --text-primary-dark: #F1F5F9;
-  --text-secondary-dark: #94A3B8;
-
+  /* Radius */
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-full: 999px;
 
-  --shadow-soft: 0 8px 30px rgba(15, 23, 42, 0.08);
-  --shadow-strong: 0 20px 50px rgba(15, 23, 42, 0.16);
+  /* Font */
+  --font-main:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
 
-  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-
-  --gradient-primary: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
-  --gradient-success: linear-gradient(135deg, #22C55E 0%, #06B6D4 100%);
-  --gradient-danger: linear-gradient(135deg, #EF4444 0%, #F59E0B 100%);
-
+  /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
+  /* Layout */
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 84px;
   --navbar-height: 72px;
+
+  /* Status Colors */
+  --color-success: #22C55E;
+  --color-danger: #EF4444;
+  --color-warning: #F59E0B;
+  --color-info: #3B82F6;
+
+  /* RGB Status Colors */
+  --color-success-rgb: 34, 197, 94;
+  --color-danger-rgb: 239, 68, 68;
+  --color-warning-rgb: 245, 158, 11;
+  --color-info-rgb: 59, 130, 246;
+
+  /* Default Primary */
+  --color-primary: #4F46E5;
+  --color-primary-light: #6366F1;
+  --color-primary-dark: #3730A3;
+
+  --color-secondary: #06B6D4;
+
+  --color-primary-rgb: 79, 70, 229;
+  --color-secondary-rgb: 6, 182, 212;
+
+  /* Gradients */
+  --gradient-primary:
+    linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-secondary) 100%
+    );
+
+  --gradient-success:
+    linear-gradient(
+      135deg,
+      var(--color-success) 0%,
+      var(--color-secondary) 100%
+    );
+
+  --gradient-danger:
+    linear-gradient(
+      135deg,
+      var(--color-danger) 0%,
+      var(--color-warning) 100%
+    );
 }
 
-[data-theme='dark'] {
-  --bg: var(--bg-dark);
-  --surface: var(--surface-dark);
-  --border: var(--border-dark);
-  --text-primary: var(--text-primary-dark);
-  --text-secondary: var(--text-secondary-dark);
-}
+
+/* =========================================================
+   LIGHT MODE
+   ========================================================= */
 
 [data-theme='light'] {
-  --bg: var(--bg-light);
-  --surface: var(--surface-light);
-  --border: var(--border-light);
-  --text-primary: var(--text-primary-light);
-  --text-secondary: var(--text-secondary-light);
+  --bg: #F8FAFC;
+
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-solid: #FFFFFF;
+
+  --border: rgba(148, 163, 184, 0.25);
+
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  --shadow-soft:
+    0 8px 30px rgba(15, 23, 42, 0.08);
+
+  --shadow-strong:
+    0 20px 50px rgba(15, 23, 42, 0.16);
 }
+
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+[data-theme='dark'] {
+  --bg: #111827;
+
+  --surface: rgba(17, 24, 39, 0.68);
+  --surface-solid: #111827;
+
+  --border: rgba(255, 255, 255, 0.08);
+
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  --shadow-soft:
+    0 8px 30px rgba(0, 0, 0, 0.20);
+
+  --shadow-strong:
+    0 20px 50px rgba(0, 0, 0, 0.40);
+}
+
+
+/* =========================================================
+   THEME 01 — INDIGO
+   ========================================================= */
+
+[data-color-theme='indigo'] {
+  --color-primary: #4F46E5;
+  --color-primary-light: #6366F1;
+  --color-primary-dark: #3730A3;
+  --color-secondary: #06B6D4;
+
+  --color-primary-rgb: 79, 70, 229;
+  --color-secondary-rgb: 6, 182, 212;
+}
+
+
+/* =========================================================
+   THEME 02 — EMERALD
+   ========================================================= */
+
+[data-color-theme='emerald'] {
+  --color-primary: #10B981;
+  --color-primary-light: #34D399;
+  --color-primary-dark: #047857;
+  --color-secondary: #14B8A6;
+
+  --color-primary-rgb: 16, 185, 129;
+  --color-secondary-rgb: 20, 184, 166;
+}
+
+
+/* =========================================================
+   THEME 03 — ROYAL PURPLE
+   ========================================================= */
+
+[data-color-theme='purple'] {
+  --color-primary: #7C3AED;
+  --color-primary-light: #8B5CF6;
+  --color-primary-dark: #5B21B6;
+  --color-secondary: #C026D3;
+
+  --color-primary-rgb: 124, 58, 237;
+  --color-secondary-rgb: 192, 38, 211;
+}
+
+
+/* =========================================================
+   THEME 04 — ROYAL BLUE
+   ========================================================= */
+
+[data-color-theme='blue'] {
+  --color-primary: #2563EB;
+  --color-primary-light: #3B82F6;
+  --color-primary-dark: #1D4ED8;
+  --color-secondary: #0EA5E9;
+
+  --color-primary-rgb: 37, 99, 235;
+  --color-secondary-rgb: 14, 165, 233;
+}
+
+
+/* =========================================================
+   THEME 05 — ROSE
+   ========================================================= */
+
+[data-color-theme='rose'] {
+  --color-primary: #E11D48;
+  --color-primary-light: #F43F5E;
+  --color-primary-dark: #BE123C;
+  --color-secondary: #DB2777;
+
+  --color-primary-rgb: 225, 29, 72;
+  --color-secondary-rgb: 219, 39, 119;
+}
+
+
+/* =========================================================
+   THEME 06 — GOLD
+   ========================================================= */
+
+[data-color-theme='gold'] {
+  --color-primary: #D97706;
+  --color-primary-light: #F59E0B;
+  --color-primary-dark: #B45309;
+  --color-secondary: #CA8A04;
+
+  --color-primary-rgb: 217, 119, 6;
+  --color-secondary-rgb: 202, 138, 4;
+}
+
+
+/* =========================================================
+   THEME 07 — CYBER NEON
+   ========================================================= */
+
+[data-color-theme='cyber'] {
+  --color-primary: #06B6D4;
+  --color-primary-light: #22D3EE;
+  --color-primary-dark: #0891B2;
+  --color-secondary: #A855F7;
+
+  --color-primary-rgb: 6, 182, 212;
+  --color-secondary-rgb: 168, 85, 247;
+}
+
+
+/* =========================================================
+   THEME 08 — MIDNIGHT
+   ========================================================= */
+
+[data-color-theme='midnight'] {
+  --color-primary: #6366F1;
+  --color-primary-light: #818CF8;
+  --color-primary-dark: #4338CA;
+  --color-secondary: #8B5CF6;
+
+  --color-primary-rgb: 99, 102, 241;
+  --color-secondary-rgb: 139, 92, 246;
+}
+
+
+/* =========================================================
+   THEME 09 — OCEAN
+   ========================================================= */
+
+[data-color-theme='ocean'] {
+  --color-primary: #0891B2;
+  --color-primary-light: #06B6D4;
+  --color-primary-dark: #155E75;
+  --color-secondary: #0D9488;
+
+  --color-primary-rgb: 8, 145, 178;
+  --color-secondary-rgb: 13, 148, 136;
+}
+
+
+/* =========================================================
+   THEME 10 — FINANCE
+   ========================================================= */
+
+[data-color-theme='finance'] {
+  --color-primary: #22C55E;
+  --color-primary-light: #4ADE80;
+  --color-primary-dark: #16A34A;
+  --color-secondary: #14B8A6;
+
+  --color-primary-rgb: 34, 197, 94;
+  --color-secondary-rgb: 20, 184, 166;
+}
+
+
+/* =========================================================
+   SPECIAL DARK THEMES
+   ========================================================= */
+
+[data-theme='dark'][data-color-theme='cyber'],
+[data-theme='dark'][data-color-theme='midnight'],
+[data-theme='dark'][data-color-theme='finance'] {
+  --bg: #080D12;
+
+  --surface: rgba(15, 23, 42, 0.70);
+
+  --surface-solid: #0F172A;
+
+  --border:
+    rgba(var(--color-primary-rgb), 0.14);
+}
+
+
+/* Ocean Dark */
+
+[data-theme='dark'][data-color-theme='ocean'] {
+  --bg: #06151A;
+
+  --surface:
+    rgba(8, 51, 62, 0.65);
+}
+
+
+/* Purple Dark */
+
+[data-theme='dark'][data-color-theme='purple'] {
+  --bg: #10091D;
+
+  --surface:
+    rgba(46, 16, 101, 0.35);
+}
+
+
+/* Rose Dark */
+
+[data-theme='dark'][data-color-theme='rose'] {
+  --bg: #18070C;
+
+  --surface:
+    rgba(76, 5, 25, 0.35);
+}
+
+
+/* Gold Dark */
+
+[data-theme='dark'][data-color-theme='gold'] {
+  --bg: #171006;
+
+  --surface:
+    rgba(69, 26, 3, 0.35);
+}
+
+
+/* Emerald Dark */
+
+[data-theme='dark'][data-color-theme='emerald'] {
+  --bg: #061712;
+
+  --surface:
+    rgba(6, 78, 59, 0.30);
+}
+
+
+/* Blue Dark */
+
+[data-theme='dark'][data-color-theme='blue'] {
+  --bg: #07111F;
+
+  --surface:
+    rgba(23, 37, 84, 0.35);
+}
+
+/* =========================================================
+   THEME 11 — AURORA
+   ========================================================= */
+
+[data-color-theme='aurora'] {
+  --color-primary: #22D3EE;
+  --color-primary-light: #67E8F9;
+  --color-primary-dark: #0891B2;
+
+  --color-secondary: #A78BFA;
+
+  --color-primary-rgb: 34, 211, 238;
+  --color-secondary-rgb: 167, 139, 250;
+}
+
+
+/* =========================================================
+   THEME 12 — SUNSET
+   ========================================================= */
+
+[data-color-theme='sunset'] {
+  --color-primary: #F97316;
+  --color-primary-light: #FB923C;
+  --color-primary-dark: #C2410C;
+
+  --color-secondary: #EC4899;
+
+  --color-primary-rgb: 249, 115, 22;
+  --color-secondary-rgb: 236, 72, 153;
+}
+
+
+/* =========================================================
+   THEME 13 — FOREST
+   ========================================================= */
+
+[data-color-theme='forest'] {
+  --color-primary: #15803D;
+  --color-primary-light: #22C55E;
+  --color-primary-dark: #166534;
+
+  --color-secondary: #84CC16;
+
+  --color-primary-rgb: 21, 128, 61;
+  --color-secondary-rgb: 132, 204, 22;
+}
+
+
+/* =========================================================
+   THEME 14 — LAVENDER
+   ========================================================= */
+
+[data-color-theme='lavender'] {
+  --color-primary: #A855F7;
+  --color-primary-light: #C084FC;
+  --color-primary-dark: #7E22CE;
+
+  --color-secondary: #E879F9;
+
+  --color-primary-rgb: 168, 85, 247;
+  --color-secondary-rgb: 232, 121, 249;
+}
+
+
+/* =========================================================
+   THEME 15 — CRIMSON
+   ========================================================= */
+
+[data-color-theme='crimson'] {
+  --color-primary: #DC2626;
+  --color-primary-light: #F87171;
+  --color-primary-dark: #991B1B;
+
+  --color-secondary: #F43F5E;
+
+  --color-primary-rgb: 220, 38, 38;
+  --color-secondary-rgb: 244, 63, 94;
+}
+
+
+/* =========================================================
+   THEME 16 — ARCTIC
+   ========================================================= */
+
+[data-color-theme='arctic'] {
+  --color-primary: #38BDF8;
+  --color-primary-light: #7DD3FC;
+  --color-primary-dark: #0284C7;
+
+  --color-secondary: #E0F2FE;
+
+  --color-primary-rgb: 56, 189, 248;
+  --color-secondary-rgb: 224, 242, 254;
+}
+
+
+/* =========================================================
+   THEME 17 — SLATE
+   ========================================================= */
+
+[data-color-theme='slate'] {
+  --color-primary: #475569;
+  --color-primary-light: #64748B;
+  --color-primary-dark: #1E293B;
+
+  --color-secondary: #94A3B8;
+
+  --color-primary-rgb: 71, 85, 105;
+  --color-secondary-rgb: 148, 163, 184;
+}
+
+
+/* =========================================================
+   THEME 18 — NEON LIME
+   ========================================================= */
+
+[data-color-theme='lime'] {
+  --color-primary: #84CC16;
+  --color-primary-light: #A3E635;
+  --color-primary-dark: #4D7C0F;
+
+  --color-secondary: #22C55E;
+
+  --color-primary-rgb: 132, 204, 22;
+  --color-secondary-rgb: 34, 197, 94;
+}
+
+
+/* =========================================================
+   THEME 19 — COPPER
+   ========================================================= */
+
+[data-color-theme='copper'] {
+  --color-primary: #C2410C;
+  --color-primary-light: #F97316;
+  --color-primary-dark: #9A3412;
+
+  --color-secondary: #F59E0B;
+
+  --color-primary-rgb: 194, 65, 12;
+  --color-secondary-rgb: 245, 158, 11;
+}
+
+
+/* =========================================================
+   THEME 20 — REALISTIC GLASS
+   ========================================================= */
+
+[data-color-theme='glass'] {
+  --color-primary: #7DD3FC;
+  --color-primary-light: #BAE6FD;
+  --color-primary-dark: #0284C7;
+
+  --color-secondary: #C4B5FD;
+
+  --color-primary-rgb: 125, 211, 252;
+  --color-secondary-rgb: 196, 181, 253;
+}
+/* =========================================================
+   NEW THEME LIGHT BACKGROUNDS
+   ========================================================= */
+
+[data-theme='light'][data-color-theme='aurora'] {
+  --bg: #F0FDFA;
+
+  --surface: rgba(255, 255, 255, 0.70);
+
+  --border: rgba(34, 211, 238, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(34, 211, 238, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='sunset'] {
+  --bg: #FFF7ED;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(249, 115, 22, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(249, 115, 22, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='forest'] {
+  --bg: #F0FDF4;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(21, 128, 61, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(21, 128, 61, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='lavender'] {
+  --bg: #FAF5FF;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(168, 85, 247, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(168, 85, 247, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='crimson'] {
+  --bg: #FFF1F2;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(220, 38, 38, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(220, 38, 38, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='arctic'] {
+  --bg: #F0F9FF;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(56, 189, 248, 0.20);
+
+  --shadow-soft:
+    0 8px 30px rgba(56, 189, 248, 0.14);
+}
+
+
+[data-theme='light'][data-color-theme='slate'] {
+  --bg: #F8FAFC;
+
+  --surface: rgba(255, 255, 255, 0.76);
+
+  --border: rgba(71, 85, 105, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(15, 23, 42, 0.10);
+}
+
+
+[data-theme='light'][data-color-theme='lime'] {
+  --bg: #F7FEE7;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(132, 204, 22, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(132, 204, 22, 0.12);
+}
+
+
+[data-theme='light'][data-color-theme='copper'] {
+  --bg: #FFF7ED;
+
+  --surface: rgba(255, 255, 255, 0.72);
+
+  --border: rgba(194, 65, 12, 0.18);
+
+  --shadow-soft:
+    0 8px 30px rgba(194, 65, 12, 0.12);
+}
+
+/* =========================================================
+   THEME 11 — GLASS (iOS / macOS Liquid Glass Finish)
+   ========================================================= */
+/* =========================================================
+   THEME 11 — CRYSTAL GLASS (VisionOS Acrylic)
+   ========================================================= */
+
+[data-color-theme='glass'] {
+  /* Slate/Azure tint to make the glass look premium */
+  --color-primary: #38BDF8;
+  --color-primary-light: #7DD3FC;
+  --color-primary-dark: #0284C7;
+  --color-secondary: #818CF8;
+  
+  --color-primary-rgb: 56, 189, 248;
+  --color-secondary-rgb: 129, 140, 248;
+
+  /* Almost completely transparent body, sharp white top edge, soft bottom tint */
+  --gradient-primary: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(var(--color-primary-rgb), 0.02) 80%,
+    rgba(var(--color-primary-rgb), 0.15) 100%
+  );
+}
+
+
+
+/* --- DARK CRYSTAL --- */
+[data-theme='dark'][data-color-theme='glass'] {
+  /* Deep void, no muddiness */
+  --bg: radial-gradient(circle at top right, #1E293B 0%, #020617 100%);
+  
+  --surface: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.10) 0%, 
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  
+  --surface-solid: rgba(15, 23, 42, 0.85);
+  --border: rgba(255, 255, 255, 0.15);
+  
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #475569;
+  
+  /* Very sharp, defined rims without heavy black smudges */
+  --shadow-soft: 
+    0 12px 30px -5px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.20);
+    
+  --shadow-strong: 
+    0 24px 50px -8px rgba(0, 0, 0, 0.60),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.30);
+}
+[data-theme='dark'][data-color-theme='glass'] select option,
+[data-theme='dark'][data-color-theme='glass'] select optgroup {
+  /* Forces a solid deep-space dark background so the white text pops */
+  background-color: #0F172A !important; 
+  color: #F8FAFC !important; 
+}
+
+
+/* --- DARK CRYSTAL --- */
+[data-theme='light'][data-color-theme='glass'] {
+  /* Deep void, no muddiness */
+  --bg: radial-gradient(circle at top right, #1E293B 0%, #020617 100%);
+  
+  --surface: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.10) 0%, 
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  
+  --surface-solid: rgba(15, 23, 42, 0.85);
+  --border: rgba(255, 255, 255, 0.15);
+  
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #475569;
+  
+  /* Very sharp, defined rims without heavy black smudges */
+  --shadow-soft: 
+    0 12px 30px -5px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.20);
+    
+  --shadow-strong: 
+    0 24px 50px -8px rgba(0, 0, 0, 0.60),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.30);
+}
+[data-theme='light'][data-color-theme='glass'] select option,
+[data-theme='light'][data-color-theme='glass'] select optgroup {
+  /* Forces a solid deep-space dark background so the white text pops */
+  background-color: #0F172A !important; 
+  color: #F8FAFC !important; 
+}
+
+
+
+

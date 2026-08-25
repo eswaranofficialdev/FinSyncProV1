@@ -87,7 +87,7 @@
   .navbar { top: 12px; margin: 12px 12px 0; }
   .mobile-only { display: flex; }
   .navbar-left .icon-btn:first-child { display: none; }
-  .navbar-search { display: none; }
+  /* .navbar-search { display: none; } */
   .profile-meta { display: none; }
 }
 
@@ -95,4 +95,116 @@
   .navbar { padding: 0 14px; height: 62px; }
   .icon-btn { width: 38px; height: 38px; font-size: 0.95rem; }
   .avatar-circle { width: 36px; height: 36px; }
+}
+
+/* ... Keep all your existing navbar.css code above this ... */
+
+/* --- Notification Dropdown Styles --- */
+.notif-wrapper {
+  position: relative;
+}
+
+/* Target the dropdown specifically to override the transparent glass-card effect */
+.notif-dropdown {
+  position: absolute;
+  top: 54px;
+  right: -60px;
+  width: 320px;
+  
+  /* 🌟 THE FIX: Force a solid background matching your theme */
+  background: var(--bg-primary, #ffffff) !important; 
+  
+  border-radius: var(--radius-md);
+  /* 🌟 Stronger shadow so it doesn't blend into the page */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3) !important; 
+  
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 9999; /* Super high z-index to stay above charts and tables */
+  border: 1px solid var(--border);
+}
+
+.notif-dropdown-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.notif-dropdown-body {
+  max-height: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.notif-dropdown-item {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notif-dropdown-item:hover {
+  background: rgba(79, 70, 229, 0.05); /* Slight primary color hover */
+}
+
+.notif-dropdown-item.unread {
+  background: rgba(245, 158, 11, 0.05); /* Slight warning color for unread */
+  border-left: 3px solid var(--color-warning);
+}
+
+.notif-dropdown-item .notif-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin: 0 0 4px 0;
+  color: var(--text-primary);
+}
+
+.notif-dropdown-item .notif-message {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+}
+
+.notif-dropdown-item .notif-time {
+  font-size: 0.7rem;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.notif-empty {
+  padding: 30px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.notif-dropdown-footer {
+  padding: 12px;
+  text-align: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--color-primary);
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.notif-dropdown-footer:hover {
+  background: rgba(79, 70, 229, 0.08);
+}
+
+@media (max-width: 900px) {
+  .notif-dropdown {
+    position: fixed;
+    top: 70px;
+    right: 14px;
+    left: 14px;
+    width: auto;
+  }
 }

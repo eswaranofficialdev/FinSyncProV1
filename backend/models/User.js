@@ -3,6 +3,12 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
   {
+    uid: {
+      type: String,
+      unique: true,
+      required: true,
+      default: () => Math.floor(100000 + Math.random() * 900000).toString(), // Generates a random 6-digit string
+    },
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true, minlength: 6, select: false },
