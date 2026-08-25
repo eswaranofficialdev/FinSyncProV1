@@ -116,7 +116,7 @@ exports.getBudgetRecommendations = asyncHandler(async (req, res) => {
       } 
     }
   ]);
-
+//recomandations
   const recommendations = pastSpending.map(item => {
     const avgMonthlySpend = Math.round(item.totalSpent / 3);
     const suggestedLimit = Math.ceil((avgMonthlySpend * 1.1) / 500) * 500;
