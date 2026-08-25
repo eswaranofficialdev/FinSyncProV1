@@ -15,18 +15,6 @@ body {
   transition: background var(--transition-base), color var(--transition-base);
   overflow-x: hidden;
 }
-
-body {
-  /* Prevents accidental pull-to-refresh on mobile */
-  overscroll-behavior-y: contain; 
-  
-  /* Safe area padding for notch/status bar */
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
 /* FIXED: Blobs now change color based on the selected theme instead of staying blue! */
 body::before {
   content: '';
