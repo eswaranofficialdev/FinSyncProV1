@@ -115,6 +115,7 @@ exports.getBudgetRecommendations = asyncHandler(async (req, res) => {
         count: { $sum: 1 }
       } 
     }
+    
   ]);
 //recomandations
   const recommendations = pastSpending.map(item => {
