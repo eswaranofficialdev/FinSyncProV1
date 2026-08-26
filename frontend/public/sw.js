@@ -1,15 +1,15 @@
-// public/sw.js
+const CACHE_NAME = 'finsync-v1';
 
 self.addEventListener('install', (event) => {
+  console.log('[SW] Installing');
+
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
-});
+  console.log('[SW] Activating');
 
-// This fetch listener is strictly required by Chrome to trigger the PWA install prompt.
-self.addEventListener('fetch', (event) => {
-  // Pass through all requests normally
-  event.respondWith(fetch(event.request));
+  event.waitUntil(
+    self.clients.claim()
+  );
 });
