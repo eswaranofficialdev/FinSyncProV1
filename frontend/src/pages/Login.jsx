@@ -17,7 +17,8 @@ const Login = () => {
   const onSubmit = async (formData) => {
     setLoading(true);
     try {
-      await login(formData.email, formData.password);
+      // Pass formData.email, formData.password, and formData.remember to login
+      await login(formData.email, formData.password, formData.remember);
       navigate('/dashboard');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Login failed');

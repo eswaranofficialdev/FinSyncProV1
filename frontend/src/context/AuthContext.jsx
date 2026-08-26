@@ -8,8 +8,13 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Helper to get token from either storage
+  const getToken = () => {
+    return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  };
+
   const loadUser = useCallback(async () => {
-    const token = localStorage.getItem('accessToken');
+    const token = getToken();
     if (!token) {
       setLoading(false);
       return;
@@ -19,6 +24,7 @@ export const AuthProvider = ({ children }) => {
       setUser(data.data);
     } catch {
       localStorage.removeItem('accessToken');
+      sessionStorage.removeItem('accessToken');
       setUser(null);
     } finally {
       setLoading(false);
@@ -29,9 +35,21 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, [loadUser]);
 
-  const login = async (email, password) => {
+  const login = async (email, password, rememberMe = false) => {
     const { data } = await api.post('/auth/login', { email, password });
-    localStorage.setItem('accessToken', data.data.accessToken);
+    const token = data.data.accessToken;
+
+    // Clear both first to avoid conflicts
+    localStorage.removeItem('accessToken');
+    sessionStorage.removeItem('accessToken');
+
+    // Store based on Remember Me choice
+    if (rememberMe) {
+      localStorage.setItem('accessToken', token);
+    } else {
+      sessionStorage.setItem('accessToken', token);
+    }
+
     setUser(data.data.user);
     toast.success(`Welcome back, ${data.data.user.name}!`);
     return data.data.user;
@@ -50,6 +68,7 @@ export const AuthProvider = ({ children }) => {
       // ignore
     }
     localStorage.removeItem('accessToken');
+    sessionStorage.removeItem('accessToken');
     setUser(null);
   };
 
