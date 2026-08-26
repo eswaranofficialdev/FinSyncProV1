@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { motion } from 'framer-motion';
 
@@ -12,6 +12,7 @@ import {
   FaMoon,
   FaCheck,
   FaUndo,
+  FaDownload
 } from 'react-icons/fa';
 
 import api from '../services/api';
@@ -49,6 +50,57 @@ const Settings = () => {
 
   const [saving, setSaving] =
     useState(false);
+
+
+  /* ========================================================
+     PWA INSTALLATION STATES (ANDROID & IOS)
+     ======================================================== */
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+
+  useEffect(() => {
+    // 1. Detect if device is iOS
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
+    setIsIOS(isIOSDevice);
+
+    // 2. Listen for Android/Chrome install prompt
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async (e) => {
+    e.preventDefault(); // Prevent form submission
+
+    if (isInstallable && deferredPrompt) {
+      // Android / Chrome: Show native prompt
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setIsInstallable(false);
+      }
+      setDeferredPrompt(null);
+    } else if (isIOS) {
+      // iOS: Show instructions
+      toast.info(
+        'To install on iPhone/iPad: Tap the Share button at the bottom of your screen and select "Add to Home Screen". (Note: You must use Safari!)',
+        { autoClose: 7000 }
+      );
+    } else {
+      // Fallback
+      toast.info('App is already installed or your browser does not support installation.');
+    }
+  };
 
 
   /* ========================================================
@@ -673,6 +725,28 @@ const Settings = () => {
 
               </div>
 
+            </div>
+
+
+            {/* ============================================
+                APP INSTALLATION (PWA)
+                ============================================ */}
+
+            <div className="settings-section">
+              <div className="settings-section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h2>App Installation</h2>
+                  <p>Install FinSync to your home screen for a full-screen app experience.</p>
+                </div>
+                
+                <button
+                  type="button" // Important: prevents form submission
+                  className="btn btn-outline"
+                  onClick={handleInstallClick}
+                >
+                  <FaDownload style={{ marginRight: 6 }} /> Install App
+                </button>
+              </div>
             </div>
 
 
