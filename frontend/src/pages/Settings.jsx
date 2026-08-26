@@ -106,25 +106,14 @@ const Settings = () => {
        --------------------------------------------- */
 
     const handleBeforeInstallPrompt = (event) => {
+      console.log('🔥 beforeinstallprompt fired');
 
-      console.log(
-        '🔥 beforeinstallprompt fired'
-      );
-
-      /*
-       * Prevent Chrome from showing
-       * the prompt automatically.
-       */
       event.preventDefault();
 
-      /*
-       * Save the event so the
-       * Install App button can use it.
-       */
       setDeferredPrompt(event);
-
       setIsInstallable(true);
     };
+
 
 
     /* ---------------------------------------------
@@ -480,11 +469,10 @@ const Settings = () => {
           <button
             key={tab}
             type="button"
-            className={`settings-tab ${
-              activeTab === tab
+            className={`settings-tab ${activeTab === tab
                 ? 'active'
                 : ''
-            }`}
+              }`}
             onClick={() =>
               setActiveTab(tab)
             }
@@ -917,11 +905,10 @@ const Settings = () => {
                 <button
                   type="button"
 
-                  className={`mode-option ${
-                    theme === 'light'
+                  className={`mode-option ${theme === 'light'
                       ? 'active'
                       : ''
-                  }`}
+                    }`}
 
                   onClick={() =>
                     setTheme('light')
@@ -960,11 +947,10 @@ const Settings = () => {
                 <button
                   type="button"
 
-                  className={`mode-option ${
-                    theme === 'dark'
+                  className={`mode-option ${theme === 'dark'
                       ? 'active'
                       : ''
-                  }`}
+                    }`}
 
                   onClick={() =>
                     setTheme('dark')
@@ -1050,11 +1036,10 @@ const Settings = () => {
                       key={item.id}
                       type="button"
 
-                      className={`color-theme-option ${
-                        selected
+                      className={`color-theme-option ${selected
                           ? 'active'
                           : ''
-                      }`}
+                        }`}
 
                       onClick={() =>
                         changeColorTheme(
