@@ -8,12 +8,25 @@ html, body, #root {
   height: 100%;
 }
 
+/* Replace your current body { ... } with this: */
+
 body {
   font-family: var(--font-main);
   background: var(--bg);
   color: var(--text-primary);
   transition: background var(--transition-base), color var(--transition-base);
   overflow-x: hidden;
+
+  /* ==========================================
+     NEW: iPhone Notch / Safe Area Fix
+     ========================================== */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+
+  /* Prevents the annoying "pull-to-refresh" bounce when acting as a native app */
+  overscroll-behavior-y: contain; 
 }
 /* FIXED: Blobs now change color based on the selected theme instead of staying blue! */
 body::before {

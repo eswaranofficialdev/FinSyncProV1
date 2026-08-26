@@ -2,8 +2,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
-import { FaBan, FaCheckCircle, FaTrash, FaSearch } from 'react-icons/fa';
+import { FaBan, FaCheckCircle, FaTrash, FaSearch, FaSpinner } from 'react-icons/fa';
 import api from '../services/api';
+import Modal from '../components/Modal'; // Importing your existing reusable modal
 import './listPage.css';
 
 const statusBadge = (status) => {
@@ -17,6 +18,32 @@ const Users = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
+
+  // Loading states
+  const [togglingId, setTogglingId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Custom Confirmation Modal State (Reused pattern)
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    title: 'Confirm Action',
+    message: '',
+    onConfirm: () => {},
+  });
+
+  const confirm = (message, onConfirm, title = 'Are you sure?') => {
+    setConfirmConfig({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: async () => {
+        setIsDeleting(true); // Disable buttons while processing
+        await onConfirm();
+        setIsDeleting(false);
+        setConfirmConfig((prev) => ({ ...prev, isOpen: false })); // Close modal after success
+      },
+    });
+  };
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -34,6 +61,7 @@ const Users = () => {
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
   const toggleStatus = async (u) => {
+    setTogglingId(u._id); // Disable only this row's button
     const newStatus = u.status === 'suspended' ? 'active' : 'suspended';
     try {
       await api.patch(`/users/${u._id}/status`, { status: newStatus });
@@ -41,18 +69,25 @@ const Users = () => {
       fetchUsers();
     } catch {
       toast.error('Action failed');
+    } finally {
+      setTogglingId(null);
     }
   };
 
-  const deleteUser = async (u) => {
-    if (!window.confirm(`Delete ${u.name}? This cannot be undone.`)) return;
-    try {
-      await api.delete(`/users/${u._id}`);
-      toast.success('User deleted');
-      fetchUsers();
-    } catch {
-      toast.error('Delete failed');
-    }
+  const deleteUser = (u) => {
+    confirm(
+      `Delete ${u.name}? This cannot be undone.`,
+      async () => {
+        try {
+          await api.delete(`/users/${u._id}`);
+          toast.success('User deleted');
+          fetchUsers();
+        } catch {
+          toast.error('Delete failed');
+        }
+      },
+      'Delete User'
+    );
   };
 
   return (
@@ -69,7 +104,11 @@ const Users = () => {
       <div className="glass-card filter-bar">
         <div className="navbar-search" style={{ maxWidth: 320 }}>
           <FaSearch />
-          <input placeholder="Search name or email..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
+          <input 
+            placeholder="Search name or email..." 
+            value={search} 
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }} 
+          />
         </div>
       </div>
 
@@ -91,10 +130,26 @@ const Users = () => {
                   <td data-label="Status"><span className={`badge ${statusBadge(u.status)}`}>{u.status}</span></td>
                   <td data-label="Last Login">{u.lastLogin ? dayjs(u.lastLogin).format('DD MMM YYYY, hh:mm A') : 'Never'}</td>
                   <td data-label="Actions">
-                    <button className="icon-btn" title={u.status === 'suspended' ? 'Activate' : 'Suspend'} onClick={() => toggleStatus(u)}>
-                      {u.status === 'suspended' ? <FaCheckCircle /> : <FaBan />}
+                    {/* Toggle Button */}
+                    <button 
+                      className="icon-btn" 
+                      title={u.status === 'suspended' ? 'Activate' : 'Suspend'} 
+                      onClick={() => toggleStatus(u)}
+                      disabled={togglingId === u._id}
+                      style={{ opacity: togglingId === u._id ? 0.5 : 1, cursor: togglingId === u._id ? 'not-allowed' : 'pointer' }}
+                    >
+                      {togglingId === u._id ? <FaSpinner className="fa-spin" /> : (u.status === 'suspended' ? <FaCheckCircle /> : <FaBan />)}
                     </button>
-                    <button className="icon-btn" title="Delete" onClick={() => deleteUser(u)}><FaTrash /></button>
+                    
+                    {/* Delete Button */}
+                    <button 
+                      className="icon-btn" 
+                      title="Delete" 
+                      onClick={() => deleteUser(u)}
+                      disabled={togglingId === u._id}
+                    >
+                      <FaTrash />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -110,6 +165,35 @@ const Users = () => {
           </div>
         )}
       </motion.div>
+
+      {/* Reusable Custom Confirmation Modal */}
+      <Modal
+        isOpen={confirmConfig.isOpen}
+        onClose={() => setConfirmConfig((prev) => ({ ...prev, isOpen: false }))}
+        title={confirmConfig.title}
+        footer={
+          <>
+            <button 
+              className="btn btn-outline" 
+              onClick={() => setConfirmConfig((prev) => ({ ...prev, isOpen: false }))}
+              disabled={isDeleting}
+            >
+              Cancel
+            </button>
+            <button 
+              className="btn btn-danger" 
+              onClick={confirmConfig.onConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Confirm'}
+            </button>
+          </>
+        }
+      >
+        <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-main, #333)', lineHeight: 1.5 }}>
+          {confirmConfig.message}
+        </p>
+      </Modal>
     </div>
   );
 };
