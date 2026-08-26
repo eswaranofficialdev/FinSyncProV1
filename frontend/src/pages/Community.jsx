@@ -40,12 +40,17 @@ const Community = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const debounceRef = useRef(null);
+  
+  // NEW STATE: Tracks which user is currently being added to prevent multiple clicks
+  const [addingUserId, setAddingUserId] = useState(null); 
 
   const [payOpen, setPayOpen] = useState(false);
   const [selectedPayeeId, setSelectedPayeeId] = useState('');
   const [settlementRequests, setSettlementRequests] = useState([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  
+  const [processingRequestId, setProcessingRequestId] = useState(null);
 
   // Filter States
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM'));
@@ -243,7 +248,9 @@ const Community = () => {
     }, 350);
   };
 
+  // UPDATED: Added tracking state to disable button on multiple clicks
   const onAddMember = async (userId) => {
+    setAddingUserId(userId);
     try {
       await api.post(`/communities/${detail.community._id}/members`, { userId });
       toast.success('Member added');
@@ -253,6 +260,8 @@ const Community = () => {
       openDetail(detail.community._id);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to add member');
+    } finally {
+      setAddingUserId(null);
     }
   };
 
@@ -272,13 +281,31 @@ const Community = () => {
     );
   };
 
-  const onChangeRole = async (memberUserId, role) => {
-    try {
-      await api.patch(`/communities/${detail.community._id}/members/${memberUserId}/role`, { role });
-      toast.success(role === 'admin' ? 'Promoted to Community Admin' : 'Set back to Member');
-      openDetail(detail.community._id);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update role');
+  // UPDATED: Admin promotion now triggers the confirmation popup
+  const onChangeRole = async (memberUserId, role, memberName = '') => {
+    if (role === 'admin') {
+      confirm(
+        `Are you sure you want to promote ${memberName} to Community Admin? They will be able to manage expenses and members.`,
+        async () => {
+          try {
+            await api.patch(`/communities/${detail.community._id}/members/${memberUserId}/role`, { role });
+            toast.success('Promoted to Community Admin');
+            openDetail(detail.community._id);
+          } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to update role');
+          }
+        },
+        'Promote to Admin'
+      );
+    } else {
+      // Direct demotion back to member
+      try {
+        await api.patch(`/communities/${detail.community._id}/members/${memberUserId}/role`, { role });
+        toast.success('Set back to Member');
+        openDetail(detail.community._id);
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to update role');
+      }
     }
   };
 
@@ -299,7 +326,6 @@ const Community = () => {
     );
   };
 
-  // --- UPDATED: Lifetime Payable Logic ---
   const myMembership = detail?.members.find((m) => m.user?._id === user?._id);
   const myPayableRaw = myMembership
     ? (myMembership.totalOwed + (myMembership.totalReceived || 0)) - (myMembership.totalContributed + (myMembership.totalPaid || 0))
@@ -349,6 +375,7 @@ const Community = () => {
   };
 
   const respondToRequest = async (requestId, action) => {
+    setProcessingRequestId(requestId);
     try {
       await api.patch(`/communities/${detail.community._id}/settlement-requests/${requestId}`, { action });
       toast.success(action === 'approve' ? 'Payment accepted successfully' : 'Payment request rejected');
@@ -356,6 +383,8 @@ const Community = () => {
       openDetail(detail.community._id);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to respond to request');
+    } finally {
+      setProcessingRequestId(null);
     }
   };
 
@@ -363,12 +392,15 @@ const Community = () => {
     confirm(
       'Are you sure you want to cancel this payment request?',
       async () => {
+        setProcessingRequestId(requestId);
         try {
           await api.delete(`/communities/${detail.community._id}/settlement-requests/${requestId}`);
           toast.success('Payment request cancelled');
           fetchSettlementRequests(detail.community._id);
         } catch (err) {
           toast.error(err.response?.data?.message || 'Failed to cancel request');
+        } finally {
+          setProcessingRequestId(null);
         }
       },
       'Cancel Request'
@@ -487,6 +519,8 @@ const Community = () => {
                 <div className="settlement-request-list">
                   {pendingRequests.map((r) => {
                     const isRecipient = r.toUser?._id === user?._id;
+                    const isProcessing = processingRequestId === r._id; 
+
                     return (
                       <div key={r._id} className="settlement-request-item">
                         <div>
@@ -501,10 +535,20 @@ const Community = () => {
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                           {isRecipient ? (
                             <>
-                              <button className="btn btn-primary" style={{ padding: '8px 14px', fontSize: '0.78rem' }} onClick={() => respondToRequest(r._id, 'approve')}>
-                                <FaCheck /> Accept
+                              <button 
+                                className="btn btn-primary" 
+                                style={{ padding: '8px 14px', fontSize: '0.78rem' }} 
+                                onClick={() => respondToRequest(r._id, 'approve')}
+                                disabled={isProcessing} 
+                              >
+                                {isProcessing ? 'Processing...' : <><FaCheck /> Accept</>}
                               </button>
-                              <button className="btn btn-outline" style={{ padding: '8px 14px', fontSize: '0.78rem' }} onClick={() => respondToRequest(r._id, 'reject')}>
+                              <button 
+                                className="btn btn-outline" 
+                                style={{ padding: '8px 14px', fontSize: '0.78rem' }} 
+                                onClick={() => respondToRequest(r._id, 'reject')}
+                                disabled={isProcessing} 
+                              >
                                 <FaTimes /> Reject
                               </button>
                             </>
@@ -516,8 +560,9 @@ const Community = () => {
                                 style={{ padding: '6px 12px', fontSize: '0.75rem', borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}
                                 onClick={() => cancelRequest(r._id)}
                                 title="Cancel Request"
+                                disabled={isProcessing} 
                               >
-                                <FaTimes style={{ marginRight: 4 }} /> Cancel
+                                {isProcessing ? 'Canceling...' : <><FaTimes style={{ marginRight: 4 }} /> Cancel</>}
                               </button>
                             </div>
                           )}
@@ -586,11 +631,19 @@ const Community = () => {
                               {m.role !== 'owner' && (
                                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                                   {m.role === 'member' ? (
-                                    <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.75rem' }} onClick={() => onChangeRole(m.user?._id, 'admin')}>
+                                    <button 
+                                      className="btn btn-outline" 
+                                      style={{ padding: '6px 12px', fontSize: '0.75rem' }} 
+                                      onClick={() => onChangeRole(m.user?._id, 'admin', m.user?.name)}
+                                    >
                                       Make Admin
                                     </button>
                                   ) : (
-                                    <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.75rem' }} onClick={() => onChangeRole(m.user?._id, 'member')}>
+                                    <button 
+                                      className="btn btn-outline" 
+                                      style={{ padding: '6px 12px', fontSize: '0.75rem' }} 
+                                      onClick={() => onChangeRole(m.user?._id, 'member', m.user?.name)}
+                                    >
                                       Remove Admin
                                     </button>
                                   )}
@@ -1060,17 +1113,25 @@ const Community = () => {
           )}
 
           <div className="search-results-list">
-            {searchResults.map((u) => (
-              <div key={u._id} className="search-result-item">
-                <div>
-                  <p className="notif-title" style={{ fontSize: '0.85rem' }}>{u.name}</p>
-                  <p className="page-subtitle" style={{ fontSize: '0.75rem' }}>{u.email} (UID: {u.uid})</p>
+            {searchResults.map((u) => {
+              const isAdding = addingUserId === u._id; // Check if this specific user is being added
+              return (
+                <div key={u._id} className="search-result-item">
+                  <div>
+                    <p className="notif-title" style={{ fontSize: '0.85rem' }}>{u.name}</p>
+                    <p className="page-subtitle" style={{ fontSize: '0.75rem' }}>{u.email} (UID: {u.uid})</p>
+                  </div>
+                  <button 
+                    className="btn btn-primary" 
+                    style={{ padding: '8px 14px', fontSize: '0.78rem' }} 
+                    onClick={() => onAddMember(u._id)}
+                    disabled={isAdding} // Disable button to prevent multi-clicks
+                  >
+                    {isAdding ? 'Adding...' : 'Add'}
+                  </button>
                 </div>
-                <button className="btn btn-primary" style={{ padding: '8px 14px', fontSize: '0.78rem' }} onClick={() => onAddMember(u._id)}>
-                  Add
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Modal>
       </div>
