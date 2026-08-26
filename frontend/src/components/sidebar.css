@@ -1,8 +1,10 @@
 .sidebar {
   position: fixed;
-  top: 16px;
-  left: 16px;
-  bottom: 16px;
+  /* 🌟 APPLE NOTCH / SAFE AREA FIXES */
+  top: calc(16px + env(safe-area-inset-top));
+  left: calc(16px + env(safe-area-inset-left));
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  
   display: flex;
   flex-direction: column;
   padding: 20px 14px;
@@ -80,12 +82,19 @@
 @media (max-width: 900px) {
   .sidebar {
     left: -300px;
-    top: 12px;
-    bottom: 12px;
+    
+    /* 🌟 MOBILE SAFE AREA FIXES */
+    top: calc(12px + env(safe-area-inset-top));
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    
     transition: left var(--transition-base);
     width: 260px !important;
   }
-  .sidebar.mobile-open { left: 12px; }
+  
+  .sidebar.mobile-open { 
+    /* 🌟 SAFE AREA FOR OPEN SIDEBAR ON MOBILE */
+    left: calc(12px + env(safe-area-inset-left)); 
+  }
 }
 
 @media (max-width: 380px) {
