@@ -1,15 +1,13 @@
 .navbar {
   position: sticky;
-  /* 🌟 APPLE NOTCH FIX: Added safe-area math to 'top' and 'margin' */
-  top: calc(16px + env(safe-area-inset-top));
+  top: 16px;
   z-index: 90;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: var(--navbar-height);
   padding: 0 22px;
-  /* margin: top right bottom left */
-  margin: calc(16px + env(safe-area-inset-top)) 16px 0 0;
+  margin: 16px 16px 0 0;
 }
 
 .navbar-left { display: flex; align-items: center; gap: 16px; flex: 1; }
@@ -86,11 +84,7 @@
 .profile-role { width: fit-content; margin-top: 2px; }
 
 @media (max-width: 900px) {
-  .navbar { 
-    /* 🌟 APPLE NOTCH FIX FOR MOBILE */
-    top: calc(12px + env(safe-area-inset-top)); 
-    margin: calc(12px + env(safe-area-inset-top)) 12px 0; 
-  }
+  .navbar { top: 12px; margin: 12px 12px 0; }
   .mobile-only { display: flex; }
   .navbar-left .icon-btn:first-child { display: none; }
   /* .navbar-search { display: none; } */
