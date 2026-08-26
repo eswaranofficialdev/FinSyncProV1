@@ -30,7 +30,8 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
       transition={{ type: 'spring', stiffness: 220, damping: 26 }}
     >
       <div className="sidebar-brand">
-        <div className="brand-icon"><FaWallet /></div>
+        <img className="brand-icon" src="/logo192.png" alt="" />
+        {/* <div className="brand-icon"><FaWallet /></div> */}
         {!collapsed && <span className="brand-text">FinSync Pro</span>}
       </div>
 
