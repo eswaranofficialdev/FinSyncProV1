@@ -7,9 +7,20 @@ const api = axios.create({
   withCredentials: true, // send refresh token cookie
 });
 
+// Helper to get token from whichever storage has it
+const getToken = () => {
+  return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+};
+
+// Helper to clear tokens from both storages
+const clearTokens = () => {
+  localStorage.removeItem('accessToken');
+  sessionStorage.removeItem('accessToken');
+};
+
 // Attach access token to every request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
+  const token = getToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -44,13 +55,20 @@ api.interceptors.response.use(
       try {
         const { data } = await api.post('/auth/refresh');
         const newToken = data.data.accessToken;
-        localStorage.setItem('accessToken', newToken);
+
+        // Save back to whichever storage was originally being used
+        if (localStorage.getItem('accessToken')) {
+          localStorage.setItem('accessToken', newToken);
+        } else {
+          sessionStorage.setItem('accessToken', newToken);
+        }
+
         processQueue(null, newToken);
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        localStorage.removeItem('accessToken');
+        clearTokens();
         window.location.href = '/login';
         return Promise.reject(refreshError);
       } finally {
